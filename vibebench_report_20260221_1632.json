@@ -1,0 +1,57 @@
+[
+    {
+        "file": "TASK-001_manual.py",
+        "complexity": 1.0,
+        "security": {
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0
+        },
+        "execution_time_sec": 0.038,
+        "timestamp": "2026-02-21T16:32:56.854895"
+    },
+    {
+        "file": "TASK-002_manual.py",
+        "complexity": 2.0,
+        "security": {
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0
+        },
+        "execution_time_sec": 0.5417,
+        "timestamp": "2026-02-21T16:32:57.710748"
+    },
+    {
+        "file": "TASK-003_manual.py",
+        "complexity": 6.0,
+        "security": {
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0
+        },
+        "execution_time_sec": 0.0488,
+        "timestamp": "2026-02-21T16:32:58.087608"
+    },
+    {
+        "file": "TASK-004_manual.py",
+        "complexity": 6.0,
+        "security": {
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0
+        },
+        "execution_time_sec": 0.0464,
+        "timestamp": "2026-02-21T16:32:58.490772"
+    },
+    {
+        "file": "TASK-005_manual.py",
+        "complexity": 3.0,
+        "security": {
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 0
+        },
+        "execution_time_sec": 0.0347,
+        "timestamp": "2026-02-21T16:32:58.857557"
+    }
+]

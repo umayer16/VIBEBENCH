@@ -1,0 +1,17 @@
+# --- VibeBench Core Dependencies ---
+
+# Static Analysis & Complexity Metrics
+radon==6.0.1
+bandit==1.7.5
+
+# Code Quality & Formatting (Optional but recommended for the analyzer)
+pyflakes==3.1.0
+mccabe==0.7.0
+
+# Documentation & Reporting
+# (Standard libraries like json and os are built-in)
+
+# --- Research & Data Science Extensions ---
+# If you plan to plot your findings in your paper later
+pandas==2.1.1
+matplotlib==3.8.0

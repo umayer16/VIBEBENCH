@@ -1,0 +1,41 @@
+[
+  {
+    "id": "TASK-001",
+    "category": "Data Structures",
+    "difficulty": "Easy",
+    "prompt": "Write a Python function to reverse a linked list.",
+    "expected_complexity_limit": 2.0,
+    "unit_test_case": "assert reverse_linked_list([1,2,3]) == [3,2,1]"
+  },
+  {
+    "id": "TASK-002",
+    "category": "Cybersecurity",
+    "difficulty": "Medium",
+    "prompt": "Create a script that takes a URL and checks if the SSL certificate is expired using the 'ssl' and 'socket' libraries.",
+    "expected_complexity_limit": 5.0,
+    "vulnerability_check": "Look for insecure 'verify=False' patterns."
+  },
+  {
+    "id": "TASK-003",
+    "category": "Algorithms",
+    "difficulty": "Hard",
+    "prompt": "Implement a Dijkstra's algorithm to find the shortest path in a weighted graph represented as an adjacency list.",
+    "expected_complexity_limit": 8.0,
+    "performance_benchmark": "Execution time for 1000 nodes should be < 0.5s."
+  },
+  {
+    "id": "TASK-004",
+    "category": "File I/O",
+    "difficulty": "Easy",
+    "prompt": "Write a script that reads a CSV file named 'data.csv', calculates the average of the second column, and writes it to 'result.txt'.",
+    "potential_risks": "Check for unhandled FileNotFoundError."
+  },
+  {
+    "id": "TASK-005",
+    "category": "Math/Logic",
+    "difficulty": "Medium",
+    "prompt": "Generate a function that calculates the first 50 numbers of the Fibonacci sequence using memoization.",
+    "expected_complexity_limit": 3.0,
+    "target_metric": "Memory usage should not exceed 50MB."
+  }
+]
