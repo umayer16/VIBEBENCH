@@ -1,63 +1,85 @@
 import json
 import os
+import glob
 
 class VibeReporter:
     def __init__(self, json_file):
-        with open(json_file, 'r') as f:
+        """Loads the raw benchmark data from the JSON report."""
+        if not os.path.exists(json_file):
+            raise FileNotFoundError(f"Report file not found: {json_file}")
+            
+        with open(json_file, 'r', encoding='utf-8') as f:
             self.data = json.load(f)
 
-    def generate_markdown(self, output_file="VibeBench_Report.md"):
-        """Creates a high-level summary and a detailed comparison table."""
-        
-        md_content = "# 📊 VibeBench Analysis Report\n"
-        md_content += f"**Date:** {os.path.basename(output_file).split('_')[-1].replace('.md', '')}\n\n"
-        
-        # 1. Summary Statistics
-        md_content += "## 📈 Executive Summary\n"
-        total_files = len(self.data)
-        avg_complexity = sum(d['complexity'] for d in self.data) / total_files
-        avg_time = sum(d['execution_time_sec'] for d in self.data if isinstance(d['execution_time_sec'], float)) / total_files
-        
-        md_content += f"- **Total Scripts Analyzed:** {total_files}\n"
-        md_content += f"- **Average Cyclomatic Complexity:** {avg_complexity:.2f}\n"
-        md_content += f"- **Average Execution Time:** {avg_time:.4f}s\n\n"
+    def generate_markdown(self, output_file="VibeBench_Leaderboard.md"):
+        """Creates a high-level leaderboard and a detailed comparison table."""
+        if not self.data:
+            print("⚠️ No data found in the report.")
+            return
 
-        # 2. Detailed Data Table
-        md_content += "## 🔍 Detailed File Analysis\n"
-        md_content += "| File Name | Complexity | Security (High/Med/Low) | Exec Time |\n"
-        md_content += "| :--- | :---: | :---: | :---: |\n"
+        md_content = "# 🏆 AI Code Quality Leaderboard\n"
+        md_content += f"**Report Date:** {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
+        
+        # 1. Aggregate stats per model
+        models = {}
+        for entry in self.data:
+            m = entry.get('model', 'Unknown')
+            if m not in models:
+                models[m] = {"comp": [], "time": [], "docs": [], "bugs": 0}
+            
+            # Handle potential 'Error' strings in numeric fields
+            comp = entry.get('complexity')
+            if isinstance(comp, (int, float)):
+                models[m]["comp"].append(comp)
+                
+            exec_time = entry.get('execution_time_sec')
+            if isinstance(exec_time, (int, float)):
+                models[m]["time"].append(exec_time)
+            
+            doc_cov = entry.get('docstring_coverage', 0)
+            if isinstance(doc_cov, (int, float)):
+                models[m]["docs"].append(doc_cov)
+                
+            models[m]["bugs"] += entry.get('bad_practices_count', 0)
+
+        # 2. Summary Leaderboard Table
+        md_content += "## 📈 Model Comparison Summary\n"
+        md_content += "| Model | Avg Complexity | Avg Exec Time | Doc Coverage | Total Bad Practices |\n"
+        md_content += "| :--- | :---: | :---: | :---: | :---: |\n"
+
+        for m, stats in models.items():
+            avg_c = sum(stats["comp"]) / len(stats["comp"]) if stats["comp"] else 0
+            avg_t = sum(stats["time"]) / len(stats["time"]) if stats["time"] else 0
+            avg_d = sum(stats["docs"]) / len(stats["docs"]) if stats["docs"] else 0
+            
+            md_content += f"| {m.upper()} | {avg_c:.2f} | {avg_t:.4f}s | {avg_d:.1f}% | {stats['bugs']} |\n"
+
+        # 3. Detailed Data Table
+        md_content += "\n## 🔍 Detailed File Analysis\n"
+        md_content += "| Model | File Name | Complexity | Exec Time | Status |\n"
+        md_content += "| :--- | :--- | :---: | :---: | :---: |\n"
 
         for entry in self.data:
-            sec = entry['security']
-            sec_str = f"{sec['HIGH']}/{sec['MEDIUM']}/{sec['LOW']}" if isinstance(sec, dict) else "N/A"
-            
-            md_content += f"| {entry['file']} | {entry['complexity']} | {sec_str} | {entry['execution_time_sec']}s |\n"
-
-        # 3. Research Insights (Automated)
-        md_content += "\n## 💡 Key Research Insights\n"
-        high_risk = [d['file'] for d in self.data if isinstance(d['security'], dict) and d['security']['HIGH'] > 0]
-        
-        if high_risk:
-            md_content += f"- ⚠️ **Security Alert:** {len(high_risk)} files contain high-severity vulnerabilities.\n"
-        else:
-            md_content += "- ✅ No high-severity security vulnerabilities detected.\n"
-            
-        md_content += "- *Recommendation:* Compare these results against the Human-Baseline folder to calculate the 'Vibe Efficiency Gap'.\n"
+            md_content += (f"| {entry.get('model', 'N/A').upper()} | {entry['file']} | "
+                          f"{entry['complexity']} | {entry['execution_time_sec']}s | {entry['status']} |\n")
 
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(md_content)
         
-        print(f"✅ Professional Markdown report generated: {output_file}")
+        print(f"✅ Professional Leaderboard generated: {output_file}")
 
-# --- Quick Test ---
 if __name__ == "__main__":
-    # Note: This assumes you have already run vibebench.py and have a JSON file.
-    import glob
-    json_files = glob.glob("vibebench_report_*.json")
+    from datetime import datetime
+    
+    # Automatically find the latest multi-model report
+    json_files = glob.glob("vibebench_multimodel_*.json")
     
     if json_files:
+        # Sorts by creation time to find the newest one
         latest_report = max(json_files, key=os.path.getctime)
+        print(f"📄 Processing latest report: {latest_report}")
+        
         reporter = VibeReporter(latest_report)
         reporter.generate_markdown()
     else:
-        print("No report files found. Run vibebench.py first!")
+        print("❌ No report files found. Please run 'python vibebench.py' first.")
