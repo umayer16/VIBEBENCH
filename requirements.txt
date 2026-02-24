@@ -9,6 +9,13 @@ glob
 subprocess
 time
 datetime
+radon==6.0.1
+bandit==1.7.5
+pyflakes==3.1.0
+mccabe==0.7.0
+
+# --- Testing Dependencies ---
+pytest==8.0.0
 
 # --- Analysis & Security Extensions ---
 # Used for static quality heuristics and reporting
