@@ -1,6 +1,7 @@
 import json
 import os
 import glob
+from datetime import datetime  # FIXED: Moved from __main__ to top level for global access
 
 class VibeReporter:
     def __init__(self, json_file):
@@ -18,6 +19,7 @@ class VibeReporter:
             return
 
         md_content = "# 🏆 AI Code Quality Leaderboard\n"
+        # Accessing datetime here now works regardless of how the script is run
         md_content += f"**Report Date:** {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
         
         # 1. Aggregate stats per model
@@ -69,8 +71,6 @@ class VibeReporter:
         print(f"✅ Professional Leaderboard generated: {output_file}")
 
 if __name__ == "__main__":
-    from datetime import datetime
-    
     # Automatically find the latest multi-model report
     json_files = glob.glob("vibebench_multimodel_*.json")
     

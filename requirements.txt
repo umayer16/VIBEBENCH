@@ -1,17 +1,22 @@
 # --- VibeBench Core Dependencies ---
-
-# Static Analysis & Complexity Metrics
+# These are strictly required to run the benchmarking tool
 radon==6.0.1
-bandit==1.7.5
+ast
+re
+json
+os
+glob
+subprocess
+time
+datetime
 
-# Code Quality & Formatting (Optional but recommended for the analyzer)
+# --- Analysis & Security Extensions ---
+# Used for static quality heuristics and reporting
+bandit==1.7.5
 pyflakes==3.1.0
 mccabe==0.7.0
 
-# Documentation & Reporting
-# (Standard libraries like json and os are built-in)
-
-# --- Research & Data Science Extensions ---
-# If you plan to plot your findings in your paper later
+# --- Research & Plotting Extensions ---
+# Required for generating paper visualizations and data frames
 pandas==2.1.1
 matplotlib==3.8.0
