@@ -14,3 +14,5 @@ These scripts were manually authored to demonstrate:
 * [cite_start]`prompts.json`: The core task definitions and complexity limits.
 * [cite_start]`human_samples/`: Reference implementations for Tasks 001-005.
 * [cite_start]`ai_samples/`: Raw outputs from evaluated models (Gemini, ChatGPT, etc.)[cite: 73].
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18758578.svg)](https://doi.org/10.5281/zenodo.18758578)
