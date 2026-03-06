@@ -64,33 +64,50 @@ Several benchmarks and frameworks currently exist for evaluating the code genera
 
 Despite their widespread adoption, these tools share a common limitation: they treat code as a mathematical solution rather than a software artifact. They prioritize "binary success" (the code runs) over "structural health" (the code is maintainable). For instance, HumanEval does not penalize models for producing "spaghetti code" or failing to include docstrings, provided the output passes the unit tests.
 
-VibeBench was developed to bridge this gap between functional testing and software engineering audits. While existing tools like Evaluating Large Language Models Trained on Code focus on the logic of the algorithm, VibeBench provides an automated pipeline for quantifying technical debt. It is the first framework of its kind to integrate AST-based heuristic detection for "AI-isms" with Unix-controlled dynamic resource limiting to audit the operational parity of LLM-synthesized software against a formalized human baseline.
+VibeBench was developed to bridge this gap between functional testing and software engineering audits. While existing tools like Evaluating Large Language Models Trained on Code focus on the logic of the algorithm, VibeBench provides an automated pipeline for quantifying technical debt.To the authors' knowledge, VibeBench is among the first frameworks to integrate 
+AST-based heuristic detection for "AI-isms" with Unix-controlled dynamic resource 
+limiting to audit the operational parity of LLM-synthesized software against a 
+formalized human baseline.
 
-# Software design
-VibeBench is designed as a modular, extensible pipeline written in Python. The framework follows a "Collector-Analyzer-Executor" architecture to ensure that static heuristics and dynamic performance metrics are decoupled and independently verifiable.
+# Software Design
 
-The core logic is divided into three primary sub-packages:
+VibeBench is designed as a modular, extensible pipeline written in Python. The 
+framework follows a "Collector-Analyzer-Executor" architecture to ensure that 
+static heuristics and dynamic performance metrics are decoupled and independently 
+verifiable. The core logic is divided into three primary sub-packages.
 
-1. Static Quality Analyzer (core/analyzer.py)
-The CodeAnalyzer class serves as the static analysis engine. It utilizes the Python ast (Abstract Syntax Tree) module to parse generated code into a tree structure without execution.
+## Static Quality Analyzer (`core/analyzer.py`)
 
-Heuristic Engine: It implements custom visitors to detect "AI-isms"—patterns common in LLM outputs like ghost comments (empty # symbols) or hardcoded credentials.
+The `CodeAnalyzer` class serves as the static analysis engine, utilizing Python's 
+built-in `ast` module to parse generated code into a tree structure without 
+execution.
 
-Complexity Metrics: It integrates the radon and halstead libraries to compute Cyclomatic Complexity and Halstead volume, providing a mathematical basis for maintainability.
+- **Heuristic Engine:** Implements custom AST visitors to detect "AI-isms" — 
+  patterns common in LLM outputs such as ghost comments (empty `#` symbols) and 
+  hardcoded credentials.
+- **Complexity Metrics:** Integrates the `radon` and `halstead` libraries to 
+  compute Cyclomatic Complexity and Halstead Volume, providing a mathematical 
+  basis for maintainability assessment.
 
-2. Sandboxed Dynamic Executor (core/executor.py)
-To safely evaluate unverified AI code, the CodeExecutor implements a secure lifecycle management system.
+## Sandboxed Dynamic Executor (`core/executor.py`)
 
-Resource Limiting: It leverages the Unix resource module to enforce "hard limits" on CPU time (RLIMIT_CPU) and maximum memory address space (RLIMIT_AS). This prevents "hallucinated" infinite loops or memory-leak attacks from crashing the host system.
+The `CodeExecutor` implements a secure lifecycle management system for safely 
+evaluating unverified AI-generated code.
 
-Isolation: Each test run is executed in a clean environment, capturing stdout, stderr, and exit codes to determine runtime stability.
+- **Resource Limiting:** Leverages the Unix `resource` module to enforce hard 
+  limits on CPU time (`RLIMIT_CPU`) and maximum memory address space (`RLIMIT_AS`), 
+  preventing infinite loops or memory exhaustion from destabilizing the host system.
+- **Isolation:** Each test run executes in a clean environment, capturing `stdout`, 
+  `stderr`, and exit codes to determine runtime stability.
 
-3. Reporting and Visualization (core/reporter.py)
-The framework includes a post-processing layer that aggregates JSON-formatted raw data into human-readable formats.
+## Reporting and Visualization (`core/reporter.py`)
 
-Leaderboard Generation: It automatically calculates averages across multiple trials and generates Markdown tables for direct inclusion in documentation.
+The reporting layer aggregates JSON-formatted raw data into human-readable outputs.
 
-Performance Plotting: It utilizes matplotlib to visualize the correlation between structural complexity and execution success rates.
+- **Leaderboard Generation:** Automatically calculates averages across multiple 
+  trials and generates Markdown tables for direct inclusion in documentation.
+- **Performance Plotting:** Utilizes `matplotlib` to visualize the correlation 
+  between structural complexity scores and execution success rates.
 
 
 # Mathematics
@@ -149,13 +166,11 @@ $w_1 = 0.4$, $w_2 = 0.4$, $w_3 = 0.2$.
 
 # Figures
 
-Figures in JOSS are included using standard Markdown syntax with an additional LaTeX label for cross-referencing. 
-
 ![The VibeBench System Architecture, illustrating the modular flow from LLM code ingestion to AST-based static analysis and sandboxed execution.\label{fig:architecture}](figures/architecture.png)
 
-As shown in \autoref{fig:architecture}, the framework ensures that static heuristics (Halstead complexity, docstring coverage) are captured independently of dynamic performance metrics.
-
-Figure sizes can be customized to fit the page layout by adding a width parameter:
+As shown in \autoref{fig:architecture}, the framework ensures that static heuristics 
+(Halstead complexity, docstring coverage) are captured independently of dynamic 
+performance metrics.
 
 ![A sample of the VibeBench Leaderboard output, demonstrating how model performance is ranked across multiple trials.\label{fig:leaderboard}](figures/leaderboard_sample.png){ width=80% }
 
