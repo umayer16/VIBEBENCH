@@ -1,5 +1,5 @@
 from core.analyzer import CodeAnalyzer
-import pytest
+#import pytest
 
 def test_docstring_coverage():
     code = "def test():\n    '''Has docstring'''\n    pass"
