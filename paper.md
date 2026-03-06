@@ -24,21 +24,40 @@ VibeBench is an automated, extensible Python framework designed to fill this gap
 
 Simultaneously, the framework manages a secure lifecycle for generated scripts using Unix-based resource limiting (CPU time and memory address space) to measure runtime stability and latency. VibeBench is built for AI researchers, software auditors, and developers who need to quantify the "technical debt" introduced by autonomous agents. By grounding AI performance against a formalized Human Baseline, it provides the necessary metrics to determine if AI-generated code is truly production-ready.
 
-
 # Statement of Need
-Current evaluation methodologies for Large Language Model (LLM) generated code, such as HumanEval [@chen2021codex] and MBPP, primarily focus on functional correctness through unit testing. While these benchmarks are effective at determining if a model can solve a specific problem, they fail to audit the structural integrity and production-readiness of the resulting code. In a production environment, code that "works" but is overly complex, undocumented, or resource-inefficient creates significant technical debt and security risks.
 
-VibeBench addresses this gap by providing a toolset that treats AI-generated code as software artifacts rather than just mathematical solutions. There is a documented "documentation crisis" in LLM outputs, where models frequently omit docstrings and internal comments required for maintainability. Furthermore, existing benchmarks rarely account for the correlation between high structural complexity and runtime instability.
+Current evaluation methodologies for Large Language Model (LLM) generated code,
+such as HumanEval [@chen2021codex] and MBPP [@austin2021program], primarily focus
+on functional correctness through unit testing. While these benchmarks are
+effective at determining if a model can solve a specific problem, they fail to
+audit the structural integrity and production-readiness of the resulting code. In
+a production environment, code that "works" but is overly complex, undocumented,
+or resource-inefficient creates significant technical debt and security risks.
+
+VibeBench addresses this gap by providing a toolset that treats AI-generated code
+as software artifacts rather than just mathematical solutions. There is a
+documented "documentation crisis" in LLM outputs, where models frequently omit
+docstrings and internal comments required for maintainability. Furthermore,
+existing benchmarks rarely account for the correlation between high structural
+complexity and runtime instability.
 
 VibeBench allows researchers and software auditors to:
 
-Quantify Technical Debt: Measure Halstead complexity and documentation coverage to predict long-term maintenance costs.
+- **Quantify Technical Debt:** Measure Halstead complexity and documentation
+  coverage to predict long-term maintenance costs.
+- **Audit Security and Best Practices:** Detect "AI-isms" like ghost comments or
+  hardcoded credentials using AST-based heuristics.
+- **Benchmark Operational Parity:** Compare AI performance against a formalized
+  human baseline in a resource-constrained sandbox.
 
-Audit Security and Best Practices: Detect "AI-isms" like ghost comments or hardcoded credentials using AST-based heuristics.
-
-Benchmark Operational Parity: Compare AI performance against a formalized human baseline in a resource-constrained sandbox.
-
-By providing these metrics in an automated, reproducible framework, VibeBench enables the scientific community to move toward more robust and responsible autonomous code generation.
+By providing these capabilities in an open-source, modular format, VibeBench
+empowers researchers to conduct large-scale longitudinal studies on model
+evolution, benchmark the energy efficiency of AI-generated algorithms for Green
+IT research, and build "AI-Audit" pipelines that ensure autonomous agents adhere
+to human-centric documentation and security standards. This enables the
+scientific community to move toward a more holistic understanding of AI
+performance that prioritizes long-term software sustainability over short-term
+functional success.
 
 # State of the field
 Several benchmarks and frameworks currently exist for evaluating the code generation capabilities of Large Language Models (LLMs). The most prominent among these are HumanEval [@chen2021codex] and MBPP (Mostly Basic Python Problems) [@austin2021program]. These benchmarks establish functional correctness by measuring the pass@k metric—a statistical representation of whether a model can produce at least one solution that passes a provided suite of unit tests. Other tools, such as CodeSearchNet [@husain2019codesearchnet], provide large-scale datasets for code retrieval and summarization but are not designed for direct execution-based benchmarking.
@@ -74,58 +93,59 @@ Leaderboard Generation: It automatically calculates averages across multiple tri
 Performance Plotting: It utilizes matplotlib to visualize the correlation between structural complexity and execution success rates.
 
 
-# Research impact statement
-VibeBench provides a critical utility for the growing field of AI-assisted software engineering (AISE). As Large Language Models (LLMs) transition from simple code-completion assistants to autonomous agents, the scientific community requires robust tools to audit the "technical debt" and operational risks associated with machine-generated code.
-
-The impact of VibeBench is centered on three research areas:
-
-Automated Software Auditing: Researchers can use the framework to perform large-scale longitudinal studies on model evolution. By quantifying metrics like Halstead complexity and documentation coverage, VibeBench provides a standardized way to measure if newer model iterations are producing more maintainable code or merely more complex "spaghetti" logic.
-
-Resource Efficiency Research: The framework’s sandboxed execution environment allows researchers to safely benchmark the energy and compute efficiency of AI-generated algorithms. This is particularly relevant for Green IT research and deploying AI code in resource-constrained edge computing environments.
-
-Safety and Best Practices: By detecting "AI-isms" and hardcoded security risks through AST walking, VibeBench serves as a foundation for building "AI-Audit" pipelines. It enables the development of guardrails that ensure autonomous agents adhere to human-centric documentation and security standards.
-
-By providing these capabilities in an open-source, modular format, VibeBench empowers researchers to move toward a more holistic understanding of AI performance that prioritizes long-term software sustainability over short-term functional success.
-
 # Mathematics
 
-`VibeBench` quantifies software quality and operational performance using standardized mathematical models. Single dollars ($) are used for inline mathematics, such as the Halstead Volume $V$.
+VibeBench quantifies software quality through two complementary metric families: 
+static complexity measures derived from source structure, and dynamic operational 
+metrics derived from sandboxed execution.
 
-Double dollars make self-standing equations for static complexity:
+## Static Complexity
 
-$$V = (N_{1} + N_{2}) \cdot \log_{2}(n_{1} + n_{2})$$
+Halstead Volume ($V$) measures the information content of a program based on 
+operator and operand counts [@halstead1977elements]:
 
-You can also use plain \LaTeX for equations like the Cyclomatic Complexity calculation:
+$$V = (N_1 + N_2) \cdot \log_2(n_1 + n_2)$$
+
+where $N_1$ and $N_2$ are the total counts of operators and operands respectively, 
+and $n_1$ and $n_2$ are the counts of unique operators and operands. Higher volume 
+indicates greater cognitive load required to understand the code.
+
+Cyclomatic Complexity ($M$) quantifies the number of linearly independent paths 
+through a program's control flow graph [@mccabe1976complexity]:
 
 \begin{equation}\label{eq:cyclomatic}
 M = E - N + 2P
 \end{equation}
 
-and refer to \autoref{eq:cyclomatic} from the text to explain the relationship between control flow edges ($E$) and nodes ($N$).
+where $E$ is the number of edges, $N$ is the number of nodes in the control flow 
+graph, and $P$ is the number of connected components. VibeBench flags code with 
+$M > 10$ as high-risk for maintainability failure, consistent with McCabe's 
+original threshold.
 
-For dynamic evaluation, we define **Operational Parity** ($\Phi$) as the ratio of human-authored baseline latency ($T_{base}$) to the LLM execution time ($T_{llm}$):
+## Dynamic Operational Metrics
+
+Operational Parity ($\Phi$) measures how closely an LLM-generated solution 
+matches the runtime efficiency of a human-authored baseline:
 
 \begin{equation}\label{eq:parity}
-\Phi = \frac{T_{base}}{T_{llm}}
+\Phi = \frac{T_{\text{base}}}{T_{\text{llm}}}
 \end{equation}
 
-where a value of $\Phi \approx 1$ represents optimal performance parity with human standards.
+where $T_{\text{base}}$ is the execution latency of the human baseline and 
+$T_{\text{llm}}$ is the execution latency of the LLM-generated code under 
+identical resource constraints. A value of $\Phi \approx 1$ indicates optimal 
+parity; $\Phi \gg 1$ indicates the LLM solution is significantly slower than 
+the human baseline.
 
-# Citations
+The composite **VibeBench Score** ($\Sigma$) aggregates static and dynamic 
+performance into a single normalized metric:
 
-Citations to entries in `paper.bib` should be in
-[rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
-format. 
+$$\Sigma = w_1 \cdot \hat{V} + w_2 \cdot \hat{M} + w_3 \cdot \Phi$$
 
-The following citation keys are used throughout this manuscript to ground the development of `VibeBench` in established software science and LLM benchmarking research:
-
-- `@chen2021codex` -> "Chen et al. (2021)" for the foundations of functional correctness in the HumanEval benchmark.
-- `[@austin2021program]` -> "(Austin et al., 2021)" regarding the MBPP dataset and program synthesis.
-- `[@halstead1977elements]` -> "(Halstead, 1977)" for the mathematical basis of the complexity metrics implemented in the `analyzer` module.
-- `[@husain2019codesearchnet]` -> "(Husain et al., 2019)" for large-scale code retrieval and representation standards.
-
-If you wish to cite the `VibeBench` software repository directly for use in other research, please use the provided Zenodo DOI: `10.5281/zenodo.18758578`.
-
+where $\hat{V}$ and $\hat{M}$ are min-max normalized Halstead Volume and 
+Cyclomatic Complexity respectively, and $w_1, w_2, w_3$ are configurable 
+weights summing to 1. Default weights are set empirically at 
+$w_1 = 0.4$, $w_2 = 0.4$, $w_3 = 0.2$.
 
 # Figures
 
@@ -151,8 +171,13 @@ All scientific claims, experimental results, and data interpretations presented 
 
 # Acknowledgements
 
-The author expresses gratitude to Saint Joseph Higher Secondary School, Dhaka, for providing the academic environment necessary to pursue this research. Special thanks are extended to the Executive Committee and members of the Josephite Scintilla Science Club (JSSC) for their feedback on the framework's utility and their support of independent student research in software engineering. 
-
-The author also acknowledges the peer reviewers and editors at the Journal of Open Source Software (JOSS) whose preliminary feedback helped refine the structural documentation and scientific grounding of this manuscript.
+The author thanks the faculty and administration of Saint Joseph Higher Secondary 
+School, Dhaka, for fostering an environment that supports independent student 
+research. The author also thanks Mushrat Salehin Nibir for his valuable feedback 
+on the codebase, suggestions for improvement, and for identifying and reporting 
+issues during development. Special thanks are also extended to the Executive 
+Committee and members of the Josephite Scintilla Science Club (JSSC) for their 
+practical feedback on the framework's utility and their continued encouragement 
+of student-led work in software engineering and AI research.
 
 # References
