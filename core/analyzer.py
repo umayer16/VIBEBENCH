@@ -35,10 +35,23 @@ class CodeAnalyzer:
         operands = set()
         
         for node in ast.walk(self.tree):
-            if isinstance(node, (ast.Add, ast.Sub, ast.Mult, ast.Div, ast.And, ast.Or)):
+            if isinstance(node, (
+                # Arithmetic
+                ast.Add, ast.Sub, ast.Mult, ast.Div, ast.Mod, ast.Pow, ast.FloorDiv,
+                # Bitwise
+                ast.BitAnd, ast.BitOr, ast.BitXor, ast.LShift, ast.RShift, ast.Invert,
+                # Boolean
+                ast.And, ast.Or, ast.Not,
+                # Unary
+                ast.UAdd, ast.USub,
+                # Comparison
+                ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE,
+                ast.Is, ast.IsNot, ast.In, ast.NotIn
+            )):
                 operators.add(type(node))
             elif isinstance(node, (ast.Name, ast.Constant)):
                 operands.add(str(node))
+            
         
         n1, n2 = len(operators), len(operands)
         volume = (n1 + n2) * math.log2(n1 + n2) if (n1 + n2) > 0 else 0
