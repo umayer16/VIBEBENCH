@@ -68,7 +68,12 @@ class CodeAnalyzer:
 
         # 4. Import Efficiency
         if self.tree:
-            imports = [node.names[0].name for node in ast.walk(self.tree) if isinstance(node, ast.Import)]
+            imports = []
+            for node in ast.walk(self.tree):
+                if isinstance(node, ast.Import):
+                    imports.extend(alias.name for alias in node.names)
+                elif isinstance(node, ast.ImportFrom):
+                    imports.extend(alias.name for alias in node.names)
             if len(set(imports)) != len(imports):
                 findings.append("Duplicate imports detected.")
 
