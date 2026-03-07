@@ -102,11 +102,91 @@ class VibeBench:
         
         print(f"\n✅ Benchmark Complete. Report saved: {report_name}")
 
+def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        prog="vibebench",
+        description="VibeBench: Holistic evaluation of LLM-generated code."
+    )
+
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    # --- analyze command ---
+    analyze_parser = subparsers.add_parser(
+        "analyze",
+        help="Run static analysis on a single Python file."
+    )
+    analyze_parser.add_argument(
+        "--input",
+        required=True,
+        metavar="FILE",
+        help="Path to the Python file to analyze."
+    )
+    analyze_parser.add_argument(
+        "--output",
+        metavar="FILE",
+        default=None,
+        help="Path to save JSON results (optional, prints to stdout if omitted)."
+    )
+
+    # --- benchmark command ---
+    benchmark_parser = subparsers.add_parser(
+        "benchmark",
+        help="Run the full multi-model benchmark suite."
+    )
+    benchmark_parser.add_argument(
+        "--tasks",
+        required=True,
+        metavar="FILE",
+        help="Path to the tasks JSON file (e.g. datasets/tasks.json)."
+    )
+    benchmark_parser.add_argument(
+        "--output",
+        metavar="FILE",
+        default=None,
+        help="Path to save benchmark results JSON (optional)."
+    )
+    benchmark_parser.add_argument(
+        "--models",
+        nargs="+",
+        metavar="MODEL",
+        default=None,
+        help="Space-separated list of models to benchmark (e.g. gpt-4o gemini-1.5-pro)."
+    )
+
+    args = parser.parse_args()
+
+    if args.command == "analyze":
+        import json
+        from core.analyzer import CodeAnalyzer
+
+        with open(args.input, "r") as f:
+            code = f.read()
+
+        analyzer = CodeAnalyzer(code)
+        results = {
+            "file": args.input,
+            "halstead_metrics": analyzer.calculate_halstead_metrics(),
+            "docstring_coverage": analyzer.get_docstring_coverage(),
+            "bad_practices": analyzer.detect_bad_practices()
+        }
+
+        if args.output:
+            with open(args.output, "w") as f:
+                json.dump(results, f, indent=2)
+            print(f"Results saved to {args.output}")
+        else:
+            print(json.dumps(results, indent=2))
+
+    elif args.command == "benchmark":
+        print("Benchmark mode: running full suite...")
+        # Full benchmark pipeline hook — extend here
+        print("Tasks file:", args.tasks)
+        if args.models:
+            print("Models:", ", ".join(args.models))
+
+
 if __name__ == "__main__":
-    # Standard entry point for the CLI tool
-    folder_to_test = input("Enter the directory path to analyze (e.g., datasets): ")
-    if os.path.exists(folder_to_test):
-        bench = VibeBench(folder_to_test)
-        bench.run_benchmark()
-    else:
-        print(f"Directory not found: {folder_to_test}")
+    main()
+```
