@@ -1,5 +1,6 @@
 import ast
 import re
+import math
 
 class CodeAnalyzer:
     """
@@ -40,7 +41,7 @@ class CodeAnalyzer:
                 operands.add(str(node))
         
         n1, n2 = len(operators), len(operands)
-        volume = (n1 + n2) * (n1 + n2).bit_length()
+        volume = (n1 + n2) * math.log2(n1 + n2) if (n1 + n2) > 0 else 0
         return {"vocabulary": n1 + n2, "volume": round(volume, 2)}
 
     def detect_bad_practices(self):
