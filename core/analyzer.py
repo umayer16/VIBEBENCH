@@ -62,7 +62,11 @@ class CodeAnalyzer:
         if re.search(r'#.*(TODO|FIXME|logic here|insert here)', self.code, re.I):
             findings.append("Unfinished placeholder/TODO found.")
 
-        # 3. Import Efficiency
+        # 3. Check for Ghost Comments (empty # symbols)
+        if re.search(r'^\s*#\s*$', self.code, re.MULTILINE):
+            findings.append("Ghost comment (empty # symbol) detected.")
+
+        # 4. Import Efficiency
         if self.tree:
             imports = [node.names[0].name for node in ast.walk(self.tree) if isinstance(node, ast.Import)]
             if len(set(imports)) != len(imports):
