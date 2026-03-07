@@ -97,12 +97,13 @@ class CodeAnalyzer:
         Calculates the percentage of functions and classes that contain docstrings.
 
         Returns:
-            float: Coverage percentage (0.0 to 100.0).
+            float: Coverage percentage (0.0 to 100.0), or None if no
+            functions or classes are present in the code.
         """
         if not self.tree: return 0.0
         
-        functions = [n for n in ast.walk(self.tree) if isinstance(n, (ast.FunctionDef, ast.ClassDef))]
-        if not functions: return 100.0
+        functions = [n for n in ast.walk(self.tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))]
+        if not functions: return None
         
         documented = sum(1 for n in functions if ast.get_docstring(n))
         return round((documented / len(functions)) * 100, 2)
