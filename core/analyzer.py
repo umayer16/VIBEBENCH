@@ -143,7 +143,6 @@ class CodeAnalyzer:
 
         documented = sum(1 for n in functions if ast.get_docstring(n))
         return round((documented / len(functions)) * 100, 2)
-```
 
 ---
 
