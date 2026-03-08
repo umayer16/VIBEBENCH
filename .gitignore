@@ -1,0 +1,41 @@
+# Environment variables and secrets
+.env
+*.env
+.env.local
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Test cache
+.pytest_cache/
+*.egg-info/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VibeBench output files (optional — remove if you want to commit results)
+vibebench_multimodel_*.json
+```
+
+**Step 4:** Commit directly to main — no need for a branch for this one
+
+---
+
+## Also create a `.env.example` file
+
+This tells other users what environment variables they need without exposing your actual key. Create a new file called `.env.example`:
+```
+# Copy this file to .env and fill in your keys
+# NEVER commit .env to GitHub
+
+GEMINI_API_KEY=your_gemini_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here
