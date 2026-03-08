@@ -163,4 +163,4 @@ class TestDocstringCoverage:
         analyzer = CodeAnalyzer(SYNTAX_ERROR_CODE)
         result = analyzer.get_docstring_coverage()
         assert result == 0.0
-```
+
