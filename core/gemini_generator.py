@@ -29,11 +29,12 @@ def generate_code_gemini(prompt, model_name="gemini-1.5-flash"):
         str: The generated Python code, or an error message string.
     """
     try:
-        import google.generativeai as genai
+        from google import genai
+        from google.genai import types
     except ImportError:
         raise ImportError(
-            "google-generativeai is not installed. "
-            "Run: pip install google-generativeai"
+            "google-genai is not installed. "
+            "Run: pip install google-genai"
         )
 
     api_key = os.environ.get("GEMINI_API_KEY")
@@ -43,8 +44,7 @@ def generate_code_gemini(prompt, model_name="gemini-1.5-flash"):
             "Get a free key at https://aistudio.google.com/app/apikey"
         )
 
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel(model_name)
+    client = genai.Client(api_key=api_key)
 
     system_prompt = (
         "You are an expert Python developer. "
@@ -53,7 +53,10 @@ def generate_code_gemini(prompt, model_name="gemini-1.5-flash"):
         "and no code fences."
     )
 
-    response = model.generate_content(f"{system_prompt}\n\nTask: {prompt}")
+    response = client.models.generate_content(
+        model=model_name,
+        contents=f"{system_prompt}\n\nTask: {prompt}"
+    )
     code = response.text.strip()
 
     # Strip markdown code fences if model includes them despite instructions
