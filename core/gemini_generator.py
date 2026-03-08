@@ -119,13 +119,23 @@ def run_generator(tasks_file, model_name, output_dir="datasets"):
     failed = 0
 
     for task in tasks:
-        name = task.get("name", "unnamed_task")
+        # Support both 'name' and 'id' as task identifier
+        name = task.get("name") or task.get("id", "unnamed_task")
         prompt = task.get("prompt", "")
+        category = task.get("category", "")
+        difficulty = task.get("difficulty", "")
 
-        print(f"  [{name}] Generating...")
+        # Enrich the prompt with category and difficulty context
+        enriched_prompt = prompt
+        if category or difficulty:
+            enriched_prompt = (
+                f"[Category: {category} | Difficulty: {difficulty}]\n{prompt}"
+            )
+
+        print(f"  [{name}] {category} ({difficulty}) — Generating...")
 
         try:
-            code = generate_code_gemini(prompt, model_name=model_name)
+            code = generate_code_gemini(enriched_prompt, model_name=model_name)
             save_generated_code(code, model_name, name, output_dir)
             success += 1
         except Exception as e:
@@ -133,9 +143,8 @@ def run_generator(tasks_file, model_name, output_dir="datasets"):
             failed += 1
 
     print(f"\n✅ Generation complete: {success} succeeded, {failed} failed.")
-    print(f"Run VibeBench to analyze results:\n")
+    print(f"\nRun VibeBench to analyze results:")
     print(f"  python vibebench.py benchmark --tasks {tasks_file}")
-
 
 def main():
     parser = argparse.ArgumentParser(
