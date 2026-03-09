@@ -180,11 +180,10 @@ def main():
             print(json.dumps(results, indent=2))
 
     elif args.command == "benchmark":
-        print("Benchmark mode: running full suite...")
-        # Full benchmark pipeline hook — extend here
-        print("Tasks file:", args.tasks)
-        if args.models:
-            print("Models:", ", ".join(args.models))
+        import os
+        datasets_dir = os.path.dirname(args.tasks)
+        bench = VibeBench(root_dir=datasets_dir)
+        bench.run_benchmark()
 
 
 if __name__ == "__main__":
