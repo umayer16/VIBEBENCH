@@ -21,3 +21,4 @@ pandas==2.1.1
 matplotlib==3.8.0
 
 google-genai>=0.3.0
+groq>=0.4.0
