@@ -125,6 +125,7 @@ def run_generator(tasks_file, model_name, output_dir="datasets"):
     failed = 0
 
     for task in tasks:
+        # Support both 'name' and 'id' as task identifier
         name = task.get("name") or task.get("id", "unnamed_task")
         prompt = task.get("prompt", "")
         category = task.get("category", "")
