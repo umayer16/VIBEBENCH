@@ -95,7 +95,7 @@ class CodeAnalyzer:
 
         # 1. Check for Hardcoded Secrets
         if re.search(
-            r'(api_key|password|secret|token)\s*=\s*["\'][a-zA-Z0-9]{8,}["\']',
+            r'(api_key|password|secret|token)\s*=\s*["\'][\w]{8,}["\']',
             self.code
         ):
             findings.append("Potential hardcoded credential detected.")
