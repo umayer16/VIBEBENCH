@@ -11,7 +11,7 @@ class VibeBench:
     
     This class manages the lifecycle of code analysis, from walking through 
     model-generated datasets to executing code in a sandboxed environment 
-    and generating consolidated performance reports[cite: 70, 128].
+    and generating consolidated performance reports.
     """
 
     def __init__(self, root_dir):
@@ -34,7 +34,8 @@ class VibeBench:
             code (str): The Python source code to analyze.
 
         Returns:
-            float: The average complexity of all code blocks, rounded to two decimal places[cite: 133].
+            float: The average complexity of all code blocks, rounded to two
+                   decimal places.
         """
         try:
             blocks = cc_visit(code)
@@ -47,7 +48,7 @@ class VibeBench:
         Executes the multi-model analysis by iterating through the dataset directory.
         
         Specifically identifies 'human_samples' as the Benchmark Reference Data 
-        (Gold Standard) to ensure comparative integrity against LLM outputs[cite: 73, 175].
+        (Gold Standard) to ensure comparative integrity against LLM outputs.
         """
         print(f"🚀 Starting Multi-Model Analysis on: {self.root_dir}\n")
         
@@ -58,7 +59,7 @@ class VibeBench:
             if root == self.root_dir:
                 continue
 
-            # Formalizing the Human Baseline label for JOSS compliance
+            # Formalizing the Human Baseline label
             is_baseline = folder_name == "human_samples"
             model_label = "HUMAN_BASELINE (Reference)" if is_baseline else folder_name.upper()
 
@@ -92,7 +93,7 @@ class VibeBench:
     def save_report(self):
         """
         Serializes the benchmark results into a timestamped JSON report for 
-        further analysis or leaderboard generation[cite: 147].
+        further analysis or leaderboard generation.
         """
         timestamp = datetime.now().strftime('%Y%m%d_%H%M')
         report_name = f"vibebench_multimodel_{timestamp}.json"
