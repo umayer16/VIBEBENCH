@@ -26,21 +26,18 @@ Thumbs.db
 vibebench_multimodel_*.json
 ```
 
-**Step 4:** Commit directly to main — no need for a branch for this one
+Commit directly to main with message:
+```
+Add .gitignore to prevent committing secrets and cache files
+```
 
 ---
 
-## Also create a `.env.example` file
-
-This tells other users what environment variables they need without exposing your actual key. Create a new file called `.env.example`:
+Then immediately after, create another new file called `.env.example`:
 ```
 # Copy this file to .env and fill in your keys
 # NEVER commit .env to GitHub
 
 GEMINI_API_KEY=your_gemini_api_key_here
+GROQ_API_KEY=your_groq_api_key_here
 OPENAI_API_KEY=your_openai_api_key_here
-
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
