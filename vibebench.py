@@ -5,6 +5,8 @@ from core.executor import CodeExecutor
 from core.analyzer import CodeAnalyzer
 from radon.complexity import cc_visit
 
+SCHEMA_VERSION = "1.1"
+
 class VibeBench:
     """
     The main orchestration framework for VibeBench. 
@@ -35,13 +37,13 @@ class VibeBench:
 
         Returns:
             float: The average complexity of all code blocks, rounded to two
-                   decimal places.
+                   decimal places. Returns None on error.
         """
         try:
             blocks = cc_visit(code)
             return round(sum(b.complexity for b in blocks) / len(blocks), 2) if blocks else 0
         except Exception:
-            return "Error"
+            return None  # FIX #24: was returning string "Error"
 
     def run_benchmark(self):
         """
@@ -77,14 +79,27 @@ class VibeBench:
                     # Static Analysis using the core Analyzer
                     analyzer = CodeAnalyzer(code)
 
+                    # FIX #24-1: Use None instead of "Error" for missing numeric fields.
+                    # exec_metrics returns key "execution_time" (not "execution_time_sec"),
+                    # so we explicitly map it here and default to None on failure.
+                    raw_exec_time = exec_metrics.get("execution_time")
+                    execution_time_sec = raw_exec_time if isinstance(raw_exec_time, (int, float)) else None
+
+                    # FIX #24-3: docstring_coverage returns None when no functions exist.
+                    # Normalize to None explicitly so downstream consumers get consistent null.
+                    doc_coverage = analyzer.get_docstring_coverage()
+                    # (None is already valid JSON null — no change needed, but we are
+                    # explicit here to document the contract.)
+
                     self.results.append({
+                        "schema_version": SCHEMA_VERSION,  # FIX #24: added for future compatibility
                         "model": folder_name,
                         "category": "Benchmark Reference" if is_baseline else "AI Synthesis",
                         "file": filename,
-                        "complexity": self.get_complexity(code),
-                        "docstring_coverage": analyzer.get_docstring_coverage(),
+                        "complexity": self.get_complexity(code),    # None on error, not "Error"
+                        "docstring_coverage": doc_coverage,          # None when no functions present
                         "bad_practices_count": len(analyzer.detect_bad_practices()),
-                        "execution_time_sec": exec_metrics.get("execution_time", "Error"),
+                        "execution_time_sec": execution_time_sec,    # None on failure, not "Error"
                         "status": exec_metrics.get("status"),
                         "timestamp": datetime.now().isoformat()
                     })
@@ -167,6 +182,7 @@ def main():
 
         analyzer = CodeAnalyzer(code)
         results = {
+            "schema_version": SCHEMA_VERSION,
             "file": args.input,
             "halstead_metrics": analyzer.calculate_halstead_metrics(),
             "docstring_coverage": analyzer.get_docstring_coverage(),
