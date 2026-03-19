@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 from core.executor import CodeExecutor
 from core.analyzer import CodeAnalyzer
+from core.reporter import VibeReporter  # FIX #22: import at top level
 from radon.complexity import cc_visit
 
 SCHEMA_VERSION = "1.1"
@@ -134,8 +135,11 @@ class VibeBench:
 
     def save_report(self):
         """
-        Serializes the benchmark results into a timestamped JSON report for
-        further analysis or leaderboard generation.
+        Serializes the benchmark results into a timestamped JSON report and
+        automatically generates the leaderboard markdown via VibeReporter.
+
+        Fixes #22: previously the leaderboard had to be generated manually
+        by running core/reporter.py as a separate step.
         """
         timestamp = datetime.now().strftime('%Y%m%d_%H%M')
         report_name = f"vibebench_multimodel_{timestamp}.json"
@@ -144,6 +148,14 @@ class VibeBench:
             json.dump(self.results, f, indent=4)
 
         print(f"\n✅ Benchmark Complete. Report saved: {report_name}")
+
+        # FIX #22: auto-generate the leaderboard immediately after saving
+        try:
+            reporter = VibeReporter(report_name)
+            reporter.generate_markdown()
+        except Exception as e:
+            print(f"⚠️  Leaderboard generation failed: {e}")
+            print(f"   You can generate it manually: python core/reporter.py")
 
 
 def main():
@@ -198,7 +210,6 @@ def main():
         default=None,
         help="Space-separated list of models to benchmark (e.g. gpt-4o gemini-1.5-pro)."
     )
-    # FIX #23: new --verbose flag
     benchmark_parser.add_argument(
         "--verbose",
         action="store_true",
