@@ -243,7 +243,7 @@ def main():
     elif args.command == "benchmark":
         datasets_dir = os.path.dirname(args.tasks)
         bench = VibeBench(root_dir=datasets_dir, verbose=args.verbose)
-        bench.run_benchmark()
+        bench.run_benchmark()  
 
 
 if __name__ == "__main__":
