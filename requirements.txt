@@ -1,23 +1,14 @@
-# --- VibeBench Core Dependencies ---
-# These are strictly required to run the benchmarking tool
+# --- Core Dependencies ---
 radon==6.0.1
-bandit==1.7.5
-pyflakes==3.1.0
 mccabe==0.7.0
 
-# --- Testing Dependencies ---
+# --- Testing ---
 pytest==8.0.0
 
-# --- Analysis & Security Extensions ---
-# Used for static quality heuristics and reporting
-bandit==1.7.5
-pyflakes==3.1.0
-mccabe==0.7.0
-
-# --- Research & Plotting Extensions ---
-# Required for generating paper visualizations and data frames
+# --- Research & Plotting ---
 pandas==2.1.1
 matplotlib==3.8.0
 
+# --- LLM Generator APIs (optional) ---
 google-genai>=0.3.0
 groq>=0.4.0
