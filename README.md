@@ -129,6 +129,14 @@ pytest tests/
 
 ---
 
+## Reproducing Benchmark Results
+To reproduce the findings from our v1.2.0 release:
+1. Ensure your API keys are set in a `.env` file (see `.env.example`).
+2. Run the full suite:
+   ```bash
+   python vibebench.py benchmark --tasks datasets/prompts.json --verbose
+
+
 ## Citation
 
 If you use VibeBench in your research, please cite:
