@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use VibeBench, please cite it as below."
+message: "If you use VibeBench in your research, please cite it as follows."
 authors:
   - family-names: Arif
     given-names: Muktadir
@@ -8,4 +8,12 @@ title: "VibeBench: An Automated Framework for the Holistic Evaluation of LLM-Gen
 version: 1.2.0
 doi: 10.5281/zenodo.18758578
 date-released: 2026-03-09
-url: "https://github.com/umayer16/VIBEBENCH" 
+url: "https://github.com/umayer16/VIBEBENCH"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Arif
+      given-names: Muktadir
+  title: "VibeBench: An Automated Framework for the Holistic Evaluation of LLM-Generated Code"
+  journal: "arXiv preprint arXiv:submit/7405540"
+  year: 2026
