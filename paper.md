@@ -43,7 +43,8 @@ introduced by autonomous agents. By grounding AI performance against a
 formalized Human Baseline, it provides the necessary metrics to determine if
 AI-generated code is truly production-ready.
 
-# Statement of Need
+# Statement of need
+
 
 Current evaluation methodologies for Large Language Model (LLM) generated code,
 such as HumanEval [@chen2021codex] and MBPP [@austin2021program], primarily focus
@@ -106,7 +107,7 @@ detection for "AI-isms" with Unix-controlled dynamic resource limiting to audit
 the operational parity of LLM-synthesized software against a formalized human
 baseline.
 
-# Software Design
+# Software design
 
 VibeBench is designed as a modular, extensible pipeline written in Python. The
 framework follows a "Collector-Analyzer-Executor" architecture to ensure that
