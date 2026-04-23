@@ -229,7 +229,7 @@ All scientific claims, experimental results, and data interpretations presented
 in this paper are the original work of the author and have been manually verified
 for accuracy.
 
-# Acknowledgements
+# Acknowledgements 
 
 The author thanks the faculty and administration of Saint Joseph Higher Secondary
 School, Dhaka, for fostering an environment that supports independent student
