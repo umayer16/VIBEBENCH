@@ -147,6 +147,39 @@ The reporting layer aggregates JSON-formatted raw data into human-readable outpu
 - **Performance Plotting:** Utilizes `matplotlib` to visualize the correlation
   between structural complexity scores and execution success rates.
 
+
+# Research impact statement
+
+VibeBench enables a category of empirical software engineering research 
+that existing benchmarks cannot support: the systematic audit of 
+LLM-generated code as a software artifact rather than a mathematical 
+solution. By integrating static quality heuristics with sandboxed dynamic 
+execution, VibeBench allows researchers to answer questions that 
+pass/fail unit testing cannot address.
+
+In our initial evaluation across six models and five tasks, VibeBench 
+revealed several findings with direct implications for AI-assisted 
+software development. First, all evaluated models exhibited a significant 
+documentation gap: Claude produced 0% docstring coverage across all tasks 
+despite an 80% functional success rate, demonstrating that functional 
+correctness and code maintainability are independent dimensions that must 
+be measured separately. Second, human-authored baseline solutions achieved 
+lower average cyclomatic complexity (3.60) than every evaluated AI model, 
+confirming a systematic over-engineering tendency in LLM outputs that has 
+practical consequences for long-term code maintenance costs. Third, 
+VibeBench's heuristic detection identified a mutable default argument 
+anti-pattern in DeepSeek's TASK-005 output — a runtime-risk pattern that 
+caused an actual execution failure and that no existing benchmark would 
+surface.
+
+These findings demonstrate that VibeBench fills a genuine measurement gap 
+in the LLM evaluation landscape. Researchers studying model evolution, 
+comparing code generation approaches, or building AI-audit pipelines for 
+production deployment can use VibeBench to quantify dimensions of code 
+quality that are invisible to correctness-only benchmarks. The framework 
+is designed to be extensible, allowing the research community to add new 
+heuristics, models, and task categories as the field evolves.
+
 # Mathematics
 
 VibeBench quantifies software quality through two complementary metric families:
@@ -229,7 +262,7 @@ All scientific claims, experimental results, and data interpretations presented
 in this paper are the original work of the author and have been manually verified
 for accuracy.
 
-# Acknowledgements
+# Acknowledgements 
 
 The author thanks the faculty and administration of Saint Joseph Higher Secondary
 School, Dhaka, for fostering an environment that supports independent student
