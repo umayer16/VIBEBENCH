@@ -43,6 +43,18 @@ introduced by autonomous agents. By grounding AI performance against a
 formalized Human Baseline, it provides the necessary metrics to determine if
 AI-generated code is truly production-ready.
 
+VibeBench is designed for three primary user groups. 
+AI researchers studying model evolution can use it to 
+conduct longitudinal studies comparing how code quality 
+changes across model versions. Software engineering teams 
+evaluating AI coding assistants for production deployment 
+can use it to audit technical debt before it accumulates. 
+Benchmark designers can use it as a foundation for 
+extending evaluation beyond functional correctness. The 
+framework is released under the MIT License and designed 
+to be extensible — new models, tasks, and heuristics can 
+be added without modifying the core pipeline.
+
 # Statement of need
 
 
@@ -105,14 +117,29 @@ an automated pipeline for quantifying technical debt. To the authors' knowledge,
 VibeBench is among the first frameworks to integrate AST-based heuristic
 detection for "AI-isms" with Unix-controlled dynamic resource limiting to audit
 the operational parity of LLM-synthesized software against a formalized human
-baseline.
+baseline.Existing static analysis tools such as Pylint and Bandit 
+focus on general Python code quality rather than on 
+patterns specific to LLM-generated outputs, and do not 
+integrate dynamic sandboxed execution or comparison against 
+a human baseline.
 
 # Software design
 
-VibeBench is designed as a modular, extensible pipeline written in Python. The
-framework follows a "Collector-Analyzer-Executor" architecture to ensure that
-static heuristics and dynamic performance metrics are decoupled and independently
-verifiable. The core logic is divided into three primary sub-packages.
+VibeBench is designed as a modular, extensible pipeline 
+written in Python. The framework follows a 
+"Collector-Analyzer-Executor" architecture to ensure that 
+static heuristics and dynamic performance metrics are 
+decoupled and independently verifiable. This separation is 
+deliberate: static analysis operates on source code as 
+text, requiring no execution environment, while dynamic 
+execution requires a controlled subprocess environment with 
+resource limits. By keeping these two analytical tracks 
+independent, VibeBench allows researchers to run static 
+analysis on any Python file regardless of whether it is 
+safe to execute, and to add new heuristics to either track 
+without affecting the other. The core logic is divided 
+into three primary sub-packages, each with a single 
+well-defined responsibility.
 
 ## Static Quality Analyzer (`core/analyzer.py`)
 
