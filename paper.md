@@ -146,6 +146,8 @@ The reporting layer aggregates JSON-formatted raw data into human-readable outpu
   trials and generates Markdown tables for direct inclusion in documentation.
 - **Performance Plotting:** Utilizes `matplotlib` to visualize the correlation
   between structural complexity scores and execution success rates.
+
+
 # Research impact statement
 
 VibeBench enables a category of empirical software engineering research 
