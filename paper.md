@@ -114,14 +114,17 @@ VibeBench was developed to bridge this gap between functional testing and
 software engineering audits. While existing tools like Evaluating Large Language
 Models Trained on Code focus on the logic of the algorithm, VibeBench provides
 an automated pipeline for quantifying technical debt. To the authors' knowledge,
-VibeBench is among the first frameworks to integrate AST-based heuristic
-detection for "AI-isms" with Unix-controlled dynamic resource limiting to audit
-the operational parity of LLM-synthesized software against a formalized human
-baseline.Existing static analysis tools such as Pylint and Bandit 
+VibeBench is among the first frameworks to integrate 
+AST-based heuristic detection for "AI-isms" with 
+Unix-controlled dynamic resource limiting to audit the 
+operational parity of LLM-synthesized software against 
+a formalized human baseline.
+
+Existing static analysis tools such as Pylint and Bandit 
 focus on general Python code quality rather than on 
 patterns specific to LLM-generated outputs, and do not 
-integrate dynamic sandboxed execution or comparison against 
-a human baseline.
+integrate dynamic sandboxed execution or comparison 
+against a human baseline.
 
 # Software design
 
@@ -260,6 +263,48 @@ where $\hat{V}$ and $\hat{M}$ are min-max normalized Halstead Volume and
 Cyclomatic Complexity respectively, and $w_1, w_2, w_3$ are configurable
 weights summing to 1. Default weights are set empirically at
 $w_1 = 0.4$, $w_2 = 0.4$, $w_3 = 0.2$.
+
+
+# Limitations
+
+VibeBench is subject to several limitations that 
+constrain the generalisability of its current findings 
+and should be considered when interpreting results.
+
+First, the benchmark dataset in its current form covers 
+five tasks across three difficulty levels and six models. 
+While sufficient to demonstrate proof-of-concept findings, 
+this scale is modest compared to established benchmarks 
+such as HumanEval (164 tasks) or MBPP (374 tasks). 
+Conclusions about systematic LLM behaviour should 
+therefore be treated as preliminary until validated 
+across a larger task set.
+
+Second, VibeBench currently supports only Python. The 
+"documentation crisis" and over-engineering patterns 
+observed in this study may differ substantially in 
+statically-typed languages such as Java or TypeScript, 
+where type annotations provide an alternative form of 
+documentation and compilers enforce structural 
+constraints that Python does not.
+
+Third, the sandboxed execution environment uses 
+Unix-based resource limits (RLIMIT_CPU and RLIMIT_AS) 
+and is therefore not directly portable to Windows 
+without modification. The static analysis components 
+function cross-platform, but dynamic execution results 
+may vary across operating systems.
+
+Fourth, the Human Baseline used in this study consists 
+of solutions authored by a single developer. A more 
+robust baseline would aggregate solutions from multiple 
+experienced developers to account for individual 
+variation in coding style and complexity.
+
+These limitations represent concrete directions for 
+future work. Expanding the task set, adding 
+multi-language support, and recruiting multiple baseline 
+authors are planned for subsequent releases of VibeBench.
 
 # Figures
 
