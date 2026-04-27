@@ -114,10 +114,10 @@ VibeBench was developed to bridge this gap between functional testing and
 software engineering audits. While existing tools like Evaluating Large Language
 Models Trained on Code focus on the logic of the algorithm, VibeBench provides
 an automated pipeline for quantifying technical debt. To the authors' knowledge,
-VibeBench is among the first frameworks to integrate 
-AST-based heuristic detection for "AI-isms" with 
-Unix-controlled dynamic resource limiting to audit the 
-operational parity of LLM-synthesized software against 
+VibeBench is among the first frameworks to integrate
+AST-based heuristic detection for "AI-isms" with
+Unix-controlled dynamic resource limiting to audit the
+operational parity of LLM-synthesized software against
 a formalized human baseline.
 
 Existing static analysis tools such as Pylint and Bandit 
