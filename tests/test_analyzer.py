@@ -133,6 +133,21 @@ class TestDetectBadPractices:
         analyzer = CodeAnalyzer(SIMPLE_CODE)
         findings = analyzer.detect_bad_practices()
         assert findings == []
+    def test_detects_mutable_default_list(self):
+        code = "def process(items=[]):\n    return items"
+        analyzer = CodeAnalyzer(code)
+        findings = analyzer.detect_bad_practices()
+        assert any("mutable default" in f.lower() for f in findings)
+    def test_detects_mutable_default_dict(self):
+        code = "def fibonacci(n, memo={}):\n    return memo.get(n, n)"
+        analyzer = CodeAnalyzer(code)
+        findings = analyzer.detect_bad_practices()
+        assert any("mutable default" in f.lower() for f in findings)
+    def test_clean_function_no_mutable_default(self):
+            code = "def fibonacci(n, memo=None):\n    return n"
+            analyzer = CodeAnalyzer(code)
+            findings = analyzer.detect_bad_practices()
+            assert not any("mutable default" in f.lower() for f in findings)
 
 
 # --- Docstring Coverage Tests ---
