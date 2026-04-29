@@ -118,7 +118,18 @@ class CodeAnalyzer:
                     imports.extend(alias.name for alias in node.names)
             if len(set(imports)) != len(imports):
                 findings.append("Duplicate imports detected.")
-
+        # 5. Check for mutable default arguments (e.g. def func(x=[]) or def func(x={}))
+        if self.tree:
+            for node in ast.walk(self.tree):
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    for default in node.args.defaults:
+                        if isinstance(default, (ast.List, ast.Dict, ast.Set)):
+                            findings.append(
+                        f"Mutable default argument in function "
+                        f"'{node.name}': use None as default instead."
+                    )
+                    break # one finding per function is enough
+    
         return findings
 
     def get_docstring_coverage(self):
