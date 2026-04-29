@@ -49,17 +49,36 @@ class VibeReporter:
         md_content += "| Model | Avg Complexity | Avg Exec Time | Doc Coverage | Total Bad Practices |\n"
         md_content += "| :--- | :---: | :---: | :---: | :---: |\n"
 
-        for m, stats in models.items():
+        # Sort models by success rate descending, then by avg complexity ascending
+        sorted_models = sorted(
+            models.items(),
+            key=lambda x: (
+                
+                -(x[1]["success"] / x[1]["total"] if x[1]["total"] > 0 else 0),
+                sum(x[1]["comp"]) / len(x[1]["comp"]) if x[1]["comp"] else 0
+            )
+        )
+
+        for m, stats in sorted_models:
             avg_c = sum(stats["comp"]) / len(stats["comp"]) if stats["comp"] else 0
             avg_t = sum(stats["time"]) / len(stats["time"]) if stats["time"] else 0
             avg_d = sum(stats["docs"]) / len(stats["docs"]) if stats["docs"] else 0
-            
-            md_content += f"| {m.upper()} | {avg_c:.2f} | {avg_t:.4f}s | {avg_d:.1f}% | {stats['bugs']} |\n"
+
+            if m not in models:
+              
+              models[m] = {"comp": [], "time": [], "docs": [], "bugs": 0, "success": 0, "total": 0}
+            models[m]["total"] += 1
+            if entry.get('status') == 'Success':
+                models[m]["success"] += 1
+
+            success_rate = (stats["success"] / stats["total"] * 100) if stats["total"] > 0 else 0
+            md_content += f"| {m.upper()} | {avg_c:.2f} | {avg_t:.4f}s | {avg_d:.1f}% | {stats['bugs']} | {success_rate:.1f}% |\n"
+
 
         # 3. Detailed Data Table
         md_content += "\n## 🔍 Detailed File Analysis\n"
-        md_content += "| Model | File Name | Complexity | Exec Time | Status |\n"
-        md_content += "| :--- | :--- | :---: | :---: | :---: |\n"
+        md_content += "| Model | Avg Complexity | Avg Exec Time | Doc Coverage | Total Bad Practices | Success Rate |\n"
+        md_content += "| :--- | :---: | :---: | :---: | :---: | :---: |\n"
 
         for entry in self.data:
             md_content += (f"| {entry.get('model', 'N/A').upper()} | {entry['file']} | "
