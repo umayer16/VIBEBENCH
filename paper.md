@@ -48,7 +48,7 @@ AI researchers studying model evolution can use it to
 conduct longitudinal studies comparing how code quality 
 changes across model versions. Software engineering teams 
 evaluating AI coding assistants for production deployment 
-can use it to audit technical debt before it accumulates. 
+can use it to audit technical debt before it accumulates
 Benchmark designers can use it as a foundation for 
 extending evaluation beyond functional correctness. The 
 framework is released under the MIT License and designed 
