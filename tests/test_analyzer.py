@@ -179,3 +179,96 @@ class TestDocstringCoverage:
         result = analyzer.get_docstring_coverage()
         assert result == 0.0
 
+class TestVibeBenchScore:
+    def test_score_returns_float_for_valid_inputs(self):
+        code = "def add(a, b):\n    return a + b"
+        analyzer = CodeAnalyzer(code)
+        score = analyzer.calculate_vibebench_score(
+            complexity=2.0,
+            docstring_coverage=100.0,
+            execution_time=0.05,
+            baseline_execution_time=0.05
+        )
+        assert isinstance(score, float)
+        assert 0.0 <= score <= 1.0
+
+    def test_score_returns_none_when_execution_time_missing(self):
+        code = "def add(a, b):\n    return a + b"
+        analyzer = CodeAnalyzer(code)
+        score = analyzer.calculate_vibebench_score(
+            complexity=2.0,
+            docstring_coverage=100.0,
+            execution_time=None,
+            baseline_execution_time=0.05
+        )
+        assert score is None
+
+    def test_score_returns_none_when_baseline_missing(self):
+        code = "def add(a, b):\n    return a + b"
+        analyzer = CodeAnalyzer(code)
+        score = analyzer.calculate_vibebench_score(
+            complexity=2.0,
+            docstring_coverage=100.0,
+            execution_time=0.05,
+            baseline_execution_time=None
+        )
+        assert score is None
+
+    def test_score_returns_none_when_baseline_missing(self):
+        code = "def add(a, b):\n    return a + b"
+        analyzer = CodeAnalyzer(code)
+        score = analyzer.calculate_vibebench_score(
+            complexity=2.0,
+            docstring_coverage=100.0,
+            execution_time=0.05,
+            baseline_execution_time=None
+        )
+        assert score is None
+
+    def test_score_raises_on_invalid_weights(self):
+        code = "def add(a, b):\n    return a + b"
+        analyzer = CodeAnalyzer(code)
+        import pytest
+        with pytest.raises(ValueError):
+            analyzer.calculate_vibebench_score(
+                complexity=2.0,
+                docstring_coverage=100.0,
+                execution_time=0.05,
+                baseline_execution_time=0.05,
+                w1=0.5,
+                w2=0.5,
+                w3=0.5   # sums to 1.5, not 1.0
+            )
+    def test_score_is_lower_for_simpler_code(self):
+        """Lower VibeBench Score = better (simpler, faster)."""
+        simple_code = "def add(a, b):\n    return a + b"
+        complex_code = """
+
+def process(data):
+    results = []
+    for i in range(len(data)):
+        if data[i] > 0:
+            for j in range(i):
+                if data[j] < data[i]:
+                    results.append(data[i] * data[j])
+    return results
+"""
+        simple_analyzer = CodeAnalyzer(simple_code)
+        complex_analyzer = CodeAnalyzer(complex_code)
+
+        simple_score = simple_analyzer.calculate_vibebench_score(
+            complexity=1.0,
+            docstring_coverage=0.0,
+            execution_time=0.04,
+            baseline_execution_time=0.05
+        )
+        complex_score = complex_analyzer.calculate_vibebench_score(
+            complexity=8.0,
+            docstring_coverage=0.0,
+            execution_time=0.15,
+            baseline_execution_time=0.05
+        )
+        assert simple_score < complex_score
+
+
+
