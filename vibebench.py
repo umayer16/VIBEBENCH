@@ -72,7 +72,7 @@ class VibeBench:
         print(f"  Status          : {record['status']}")
         print()
 
-    def run_benchmark(self):
+    def run_benchmark(self, export_csv=False):
         """
         Executes the multi-model analysis by iterating through the dataset directory.
 
@@ -157,31 +157,45 @@ class VibeBench:
 
                     self.results.append(record)
 
-        self.save_report()
+        self.save_report(export_csv=export_csv)
 
-    def save_report(self):
+    def save_report(self, export_csv=False):
         """
-        Serializes the benchmark results into a timestamped JSON report and
-        automatically generates the leaderboard markdown via VibeReporter.
+    Serializes benchmark results to a timestamped JSON report and
+    optionally exports a CSV file for analysis in external tools.
 
-        Fixes #22: previously the leaderboard had to be generated manually
-        by running core/reporter.py as a separate step.
-        """
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M')
-        report_name = f"vibebench_multimodel_{timestamp}.json"
+    Args:
+        export_csv (bool): If True, also write results to a .csv file.
+    """
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M')
+    report_name = f"vibebench_multimodel_{timestamp}.json"
 
-        with open(report_name, 'w', encoding='utf-8') as f:
-            json.dump(self.results, f, indent=4)
+    with open(report_name, 'w', encoding='utf-8') as f:
+        json.dump(self.results, f, indent=4)
 
-        print(f"\n✅ Benchmark Complete. Report saved: {report_name}")
+    print(f"\n✅ Benchmark Complete. Report saved: {report_name}")
 
-        # FIX #22: auto-generate the leaderboard immediately after saving
+    # Optional CSV export
+    if export_csv:
         try:
-            reporter = VibeReporter(report_name)
-            reporter.generate_markdown()
+            import pandas as pd
+            csv_name = report_name.replace('.json', '.csv')
+            df = pd.DataFrame(self.results)
+            df.to_csv(csv_name, index=False, encoding='utf-8')
+            print(f"📊 CSV export saved: {csv_name}")
+        except ImportError:
+            print("⚠️  pandas not installed. Run: pip install pandas")
         except Exception as e:
-            print(f"⚠️  Leaderboard generation failed: {e}")
-            print(f"   You can generate it manually: python core/reporter.py")
+            print(f"⚠️  CSV export failed: {e}")
+
+    # Auto-generate leaderboard
+    try:
+        reporter = VibeReporter(report_name)
+        reporter.generate_markdown()
+    except Exception as e:
+        print(f"⚠️  Leaderboard generation failed: {e}")
+        print(f"   You can generate it manually: python core/reporter.py")
+
 
 
 def main():
@@ -237,6 +251,12 @@ def main():
         help="Space-separated list of models to benchmark (e.g. gpt-4o gemini-1.5-pro)."
     )
     benchmark_parser.add_argument(
+        "--export-csv",
+        action="store_true",
+        default=False,
+        help="Also export benchmark results as a CSV file alongside the JSON output."
+    )
+    benchmark_parser.add_argument(
         "--verbose",
         action="store_true",
         default=False,
@@ -269,7 +289,7 @@ def main():
     elif args.command == "benchmark":
         datasets_dir = os.path.dirname(args.tasks)
         bench = VibeBench(root_dir=datasets_dir, verbose=args.verbose)
-        bench.run_benchmark()  
+        bench.run_benchmark(export_csv=args.export_csv)
 
 
 if __name__ == "__main__":
