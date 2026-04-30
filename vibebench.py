@@ -81,6 +81,31 @@ class VibeBench:
         """
         print(f"🚀 Starting Multi-Model Analysis on: {self.root_dir}\n")
 
+        # Pre-scan to find baseline execution times per task
+        baseline_times = {}
+        baseline_dir = os.path.join(self.root_dir, "human_samples")
+        if os.path.exists(baseline_dir):
+            for fname in os.listdir(baseline_dir):
+                if fname.endswith(".py"):
+                    fpath = os.path.join(baseline_dir, fname)
+                    baseline_metrics = self.executor.run(fpath)
+                    bt = baseline_metrics.get("execution_time")
+                    if isinstance(bt, (int, float)):
+                        # Use task ID as key (e.g. TASK-001 from TASK-001_manual.py)
+                        task_id = fname.split("_")[0]
+                        baseline_times[task_id] = bt
+        # Extract task ID from filename for baseline lookup
+        task_id = filename.split("_")[0].upper()
+        baseline_time = baseline_times.get(task_id)
+        # Calculate VibeBench Score
+        vibebench_score = None
+        if execution_time_sec is not None and baseline_time is not None:
+            vibebench_score = analyzer.calculate_vibebench_score(
+                complexity=self.get_complexity(code),
+                docstring_coverage=doc_coverage,
+                execution_time=execution_time_sec,
+                baseline_execution_time=baseline_time
+            )
         for root, dirs, files in os.walk(self.root_dir):
             folder_name = os.path.basename(root)
 
@@ -121,6 +146,7 @@ class VibeBench:
                         "docstring_coverage": doc_coverage,
                         "bad_practices_count": len(analyzer.detect_bad_practices()),
                         "execution_time_sec": execution_time_sec,
+                        "vibebench_score": vibebench_score,  
                         "status": exec_metrics.get("status"),
                         "timestamp": datetime.now().isoformat()
                     }

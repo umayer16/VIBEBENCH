@@ -118,6 +118,7 @@ class CodeAnalyzer:
                     imports.extend(alias.name for alias in node.names)
             if len(set(imports)) != len(imports):
                 findings.append("Duplicate imports detected.")
+
         # 5. Check for mutable default arguments (e.g. def func(x=[]) or def func(x={}))
         if self.tree:
             for node in ast.walk(self.tree):
@@ -125,11 +126,11 @@ class CodeAnalyzer:
                     for default in node.args.defaults:
                         if isinstance(default, (ast.List, ast.Dict, ast.Set)):
                             findings.append(
-                        f"Mutable default argument in function "
-                        f"'{node.name}': use None as default instead."
-                    )
-                    break # one finding per function is enough
-    
+                                f"Mutable default argument in function "
+                                f"'{node.name}': use None as default instead."
+                            )
+                            break  # one finding per function is enough
+
         return findings
 
     def get_docstring_coverage(self):
@@ -154,3 +155,98 @@ class CodeAnalyzer:
 
         documented = sum(1 for n in functions if ast.get_docstring(n))
         return round((documented / len(functions)) * 100, 2)
+
+    def calculate_vibebench_score(
+        self,
+        complexity,
+        docstring_coverage,
+        execution_time,
+        baseline_execution_time,
+        all_complexities=None,
+        all_exec_times=None,
+        w1=0.4,
+        w2=0.4,
+        w3=0.2
+    ):
+        """
+        Calculates the composite VibeBench Score (Sigma) as defined in the
+        paper Mathematics section.
+
+        Sigma = w1 * V_hat + w2 * M_hat + w3 * Phi
+
+        Where V_hat and M_hat are min-max normalised Halstead Volume and
+        Cyclomatic Complexity respectively, and Phi is Operational Parity
+        (T_base / T_llm).
+
+        Args:
+            complexity (float): Cyclomatic complexity of the file (M).
+            docstring_coverage (float): Docstring coverage 0-100.
+            execution_time (float): Execution time of this file in seconds.
+            baseline_execution_time (float): Execution time of human 
+                baseline in seconds.
+            all_complexities (list): All complexity values in the benchmark
+                run, used for min-max normalisation. If None, normalisation
+                is skipped and raw value used.
+            all_exec_times (list): All execution times in the benchmark run,
+                used for min-max normalisation. If None, skipped.
+            w1 (float): Weight for Halstead Volume component (default 0.4).
+            w2 (float): Weight for Cyclomatic Complexity component 
+                (default 0.4).
+            w3 (float): Weight for Operational Parity component 
+                (default 0.2).
+
+        Returns:
+            float: VibeBench Score between 0.0 and 1.0, or None if
+                inputs are insufficient to calculate.
+        """
+        # Validate required inputs
+        if complexity is None or execution_time is None:
+            return None
+        if baseline_execution_time is None or baseline_execution_time == 0:
+            return None
+        if abs(w1 + w2 + w3 - 1.0) > 0.001:
+            raise ValueError(
+
+                f"Weights must sum to 1.0, got {w1 + w2 + w3:.3f}"
+            )
+
+        # --- Halstead Volume (V_hat) ---
+        # Use Halstead volume from the AST if available, else use 0
+        halstead = self.calculate_halstead_metrics()
+        if isinstance(halstead, dict):
+            volume = halstead.get("volume", 0)
+        else:
+            volume = 0
+
+        # Min-max normalise volume
+        if all_complexities and len(all_complexities) > 1:
+
+            v_min = min(all_complexities)
+            v_max = max(all_complexities)
+            v_hat = ((complexity - v_min) / (v_max - v_min)
+                    if v_max != v_min else 0.0)
+        else:
+            # Fallback: normalise against McCabe threshold of 10
+            v_hat = min(complexity / 10.0, 1.0)
+
+        # --- Cyclomatic Complexity (M_hat) ---
+        if all_complexities and len(all_complexities) > 1:
+            c_min = min(all_complexities)
+            c_max = max(all_complexities)
+            m_hat = ((complexity - c_min) / (c_max - c_min)
+                    if c_max != c_min else 0.0)
+        else:
+            m_hat = min(complexity / 10.0, 1.0)
+
+        # --- Operational Parity (Phi) ---
+        # Phi = T_base / T_llm
+        # Phi close to 1 = good parity. Phi > 1 = LLM is slower.
+        # Cap at 2.0 to prevent outliers dominating the score.
+        phi = min(baseline_execution_time / execution_time, 2.0)
+        # Normalise Phi to 0-1 range (1.0 = perfect parity or faster)
+        phi_normalised = min(phi / 2.0, 1.0)
+
+        # --- Composite Score ---
+        sigma = (w1 * v_hat) + (w2 * m_hat) + (w3 * phi_normalised)
+
+        return round(sigma, 4)
