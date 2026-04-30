@@ -30,6 +30,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `docstring_coverage` contract explicitly documented: returns `null` when a
   file contains no functions or classes (#24)
 
+### Added
+- `calculate_vibebench_score()` in `core/analyzer.py` — implements 
+  composite Sigma metric from paper.md Mathematics section (#8)
+- `vibebench_score` field in all JSON benchmark output records (#8)
+- `--export-csv` flag on benchmark command exports CSV alongside JSON (#9)
+
+### Fixed  
+- Mutable default argument detection in `detect_bad_practices()` (#7)
+- Leaderboard sorted by success rate descending in `reporter.py` (#10)
+- `save_report()` indentation corrected — was at module level
 ---
 
 ## [1.2.0] — 2026-03-09
