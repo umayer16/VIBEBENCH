@@ -1,3 +1,11 @@
+# DATA QUALITY NOTE (DQ-001): This file contains Dijkstra shortest
+# path code rather than CSV average calculator code as required by
+# TASK-004. This is a known data collection error documented in
+# datasets/data_quality_notes.md. The file is preserved as-is to
+# maintain reproducibility of v1.2.0 benchmark results.
+
+
+
 import heapq
 
 
