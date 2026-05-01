@@ -162,6 +162,7 @@ execution.
 The `CodeExecutor` implements a secure lifecycle management system for safely
 evaluating unverified AI-generated code.
 
+
 - **Resource Limiting:** Leverages the Unix `resource` module to enforce hard
   limits on CPU time (`RLIMIT_CPU`) and maximum memory address space (`RLIMIT_AS`),
   preventing infinite loops or memory exhaustion from destabilizing the host system.
