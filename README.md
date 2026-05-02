@@ -3,6 +3,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18758578.svg)](https://doi.org/10.5281/zenodo.18758578)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![status](https://joss.theoj.org/papers/e2f0068b712c24134f3c43abdb394eb4/status.svg)](https://joss.theoj.org/papers/e2f0068b712c24134f3c43abdb394eb4)
+[![Tests](https://github.com/umayer16/VIBEBENCH/actions/workflows/tests.yml/badge.svg)](https://github.com/umayer16/VIBEBENCH/actions/workflows/tests.yml) 
 
 **VibeBench** is an automated, extensible Python framework for the holistic
 evaluation of LLM-generated code. It goes beyond functional correctness by
@@ -32,17 +33,35 @@ the metrics that matter in real-world software engineering.
 
 ## Installation
 
-**Requirements:** Python 3.8+, Unix-based OS (Linux/macOS) for sandboxed execution.
+**Requirements:** Python 3.9+, Unix-based OS (Linux/macOS) for 
+sandboxed execution features.
+
+### Standard Install
 ```bash
-# Clone the repository
 git clone https://github.com/umayer16/VIBEBENCH.git
 cd VIBEBENCH
-
-# Install dependencies
-pip install -r requirements.txt
+pip install .
 ```
 
----
+After installation, the `vibebench` command is available globally:
+```bash
+vibebench --help
+```
+
+### Development Install
+For contributors who want changes to take effect immediately:
+```bash
+pip install -e ".[dev]"
+```
+
+### Optional LLM Generator Dependencies
+To use the model code generators (Gemini, Groq, OpenAI):
+```bash
+pip install ".[llm]"
+```
+````
+
+Two important changes here: the Python requirement is now `3.9+` to match `pyproject.toml`, and the installation uses `pip install .` rather than `pip install -r requirements.txt`. Also note you removed `Python 3.8+` — `pyproject.toml` specifies `requires-python = ">=3.9"` and you should be consistent.
 
 ## Quick Start
 
