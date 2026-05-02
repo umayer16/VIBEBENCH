@@ -80,3 +80,14 @@ exclude = [
   ".venv/",
   "venv/",
 ]
+
+[tool.coverage.run]
+omit = [
+    "core/gemini_generator.py",
+    "core/groq_generator.py",
+    "datasets/*",
+    "tests/*",
+]
+
+[tool.coverage.report]
+fail_under = 30
