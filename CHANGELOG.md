@@ -10,6 +10,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `calculate_vibebench_score()` method to `CodeAnalyzer` implementing
+  the composite Sigma metric defined in paper.md (#8)
+- `vibebench_score` field now included in all JSON benchmark records (#8)
+- `--export-csv` flag on the `benchmark` CLI command exports results
+  as CSV alongside JSON output (#9)
+- `--export-csv` flag added to benchmark_parser argparse (#9)
+
+### Fixed
+- Mutable default argument detection added to `detect_bad_practices()` 
+  covering list, dict, and set defaults in function signatures (#7)
+- Leaderboard now sorted by success rate descending in reporter.py (#10)
+
+## [Unreleased]
+
+### Added
 - `--verbose` flag on the `benchmark` CLI subcommand prints per-file metrics
   (complexity, docstring coverage, bad practices, execution time, status)
   during a run without requiring the user to open the JSON afterwards (#23)
@@ -133,6 +148,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Zenodo DOI archived: `10.5281/zenodo.18758578`
 
 ---
+
+
 
 [Unreleased]: https://github.com/umayer16/VIBEBENCH/compare/v1.2.0...HEAD
 [1.2.0]: https://github.com/umayer16/VIBEBENCH/compare/v1.1.0...v1.2.0
