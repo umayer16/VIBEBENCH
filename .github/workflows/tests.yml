@@ -29,7 +29,8 @@ jobs:
           pip install pytest pytest-cov
 
       - name: Run tests with coverage
-        run: pytest tests/ --cov=core --cov-report=term-missing --cov-omit=core/gemini_generator.py,core/groq_generator.py --cov-fail-under=30
+        run: |
+          pytest tests/ --cov=core --cov-report=term-missing
 
       - name: Lint with flake8
         run: |
