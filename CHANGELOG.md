@@ -9,57 +9,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- `calculate_vibebench_score()` method to `CodeAnalyzer` implementing
-  the composite Sigma metric defined in paper.md (#8)
-- `vibebench_score` field now included in all JSON benchmark records (#8)
-- `--export-csv` flag on the `benchmark` CLI command exports results
-  as CSV alongside JSON output (#9)
-- `--export-csv` flag added to benchmark_parser argparse (#9)
+---
 
-### Fixed
-- Mutable default argument detection added to `detect_bad_practices()` 
+## [1.3.0] — 2026-05-05
+
+### Added
+- `calculate_vibebench_score()` method in `core/analyzer.py` implementing
+  the composite Sigma metric defined in paper.md Mathematics section (#8)
+- `vibebench_score` field included in all JSON benchmark output records (#8)
+- `--export-csv` flag on benchmark command exports results as CSV
+  alongside JSON output (#9)
+- Mutable default argument detection added to `detect_bad_practices()`
   covering list, dict, and set defaults in function signatures (#7)
-- Leaderboard now sorted by success rate descending in reporter.py (#10)
-
-## [Unreleased]
-
-### Added
-- `--verbose` flag on the `benchmark` CLI subcommand prints per-file metrics
-  (complexity, docstring coverage, bad practices, execution time, status)
-  during a run without requiring the user to open the JSON afterwards (#23)
-- `schema_version` field (`"1.1"`) added to every JSON benchmark record and
-  to `analyze` command output for future compatibility (#24)
-- `CHANGELOG.md` added to repo root to track version history (#21)
-- `CITATION.cff` added to repo root to enable GitHub's "Cite this repository"
-  button for correct academic citation (#25)
+- `pyproject.toml` for proper Python packaging — `pip install .` now
+  works and installs the `vibebench` CLI entry point (#13)
+- Matrix CI testing across Python 3.9, 3.10, 3.11 with coverage
+  reporting via pytest-cov (#11)
+- `datasets/data_quality_notes.md` formally documenting dataset quality
+  issues DQ-001 and DQ-002 with severity, evidence, and decision (#5, #6)
+- Benchmark task set expanded from 5 to 10 tasks — TASK-006 through
+  TASK-010 added with human baseline solutions (#14)
+- CI status badge added to README.md
+- `CITATION.cff` keywords field added for improved discoverability
 
 ### Fixed
-- `VibeReporter` is now automatically invoked at the end of every benchmark
-  run — `VibeBench_Leaderboard.md` is always up to date without requiring a
-  separate manual step (`python core/reporter.py`) (#22)
-- `execution_time_sec` now stores `null` (JSON) / `None` (Python) on execution
-  failure instead of the string `"Error"`, preventing downstream numeric
-  analysis from breaking (#24)
-- `complexity` now returns `null` on parse error instead of the string `"Error"` (#24)
-- `docstring_coverage` contract explicitly documented: returns `null` when a
-  file contains no functions or classes (#24)
+- Leaderboard now sorted by success rate descending in `reporter.py` (#10)
+- Paper section headings corrected for JOSS compliance — `# Software design`
+  lowercase d, all required sections present (#1, #2)
+- `figures/architecture.png` replaced with clean publication-quality
+  architecture diagram (#3)
+- `figures/leaderboard_sample.png` updated with all 7 models sorted
+  by success rate (#3)
+- `save_report()` indentation corrected — was accidentally at module level
+- Paper word count expanded from 531 to ~1450 words
 
-### Added
-- `calculate_vibebench_score()` in `core/analyzer.py` — implements 
-  composite Sigma metric from paper.md Mathematics section (#8)
-- `vibebench_score` field in all JSON benchmark output records (#8)
-- `--export-csv` flag on benchmark command exports CSV alongside JSON (#9)
+### Changed
+- Python requirement updated from 3.8+ to 3.9+
+- Installation method updated to `pip install .` in README.md
+- `--cov-omit` configuration moved to `pyproject.toml` `[tool.coverage.run]`
 
-### Fixed  
-- Mutable default argument detection in `detect_bad_practices()` (#7)
-- Leaderboard sorted by success rate descending in `reporter.py` (#10)
-- `save_report()` indentation corrected — was at module level
 ---
 
 ## [1.2.0] — 2026-03-09
 
-### Added
+###Added
 - Full multi-model benchmark results committed to the repository, comparing
   ChatGPT, Claude, Gemini, Grok, DeepSeek, and LLaMA 3.3 70B across 5 tasks
 - `VibeBench_Leaderboard.md` with ranked results and per-task breakdown

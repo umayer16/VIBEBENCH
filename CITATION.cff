@@ -5,9 +5,9 @@ authors:
     given-names: Muktadir
     orcid: "https://orcid.org/0009-0005-6412-8980"
 title: "VibeBench: An Automated Framework for the Holistic Evaluation of LLM-Generated Code"
-version: 1.3.0-dev
+version: 1.3.0
 doi: 10.5281/zenodo.18758578
-date-released: 2026-03-09
+date-released: 2026-05-05
 url: "https://github.com/umayer16/VIBEBENCH"
 keywords:
   - LLM evaluation
