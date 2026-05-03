@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.3.0] — 2026-05-05
+## [1.3.0] — 2026-05-03
 
 ### Added
 - `calculate_vibebench_score()` method in `core/analyzer.py` implementing
