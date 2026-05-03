@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.0] — 2026-05-03
 
 ### Added
+
 - `calculate_vibebench_score()` method in `core/analyzer.py` implementing
   the composite Sigma metric defined in paper.md Mathematics section (#8)
 - `vibebench_score` field included in all JSON benchmark output records (#8)
@@ -33,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `CITATION.cff` keywords field added for improved discoverability
 
 ### Fixed
+
 - Leaderboard now sorted by success rate descending in `reporter.py` (#10)
 - Paper section headings corrected for JOSS compliance — `# Software design`
   lowercase d, all required sections present (#1, #2)
@@ -44,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Paper word count expanded from 531 to ~1450 words
 
 ### Changed
+
 - Python requirement updated from 3.8+ to 3.9+
 - Installation method updated to `pip install .` in README.md
 - `--cov-omit` configuration moved to `pyproject.toml` `[tool.coverage.run]`
@@ -52,7 +55,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.0] — 2026-03-09
 
-###Added
+### Added
+
 - Full multi-model benchmark results committed to the repository, comparing
   ChatGPT, Claude, Gemini, Grok, DeepSeek, and LLaMA 3.3 70B across 5 tasks
 - `VibeBench_Leaderboard.md` with ranked results and per-task breakdown
@@ -70,6 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   on every push and pull request
 
 ### Fixed
+
 - Halstead Volume formula corrected to track N1/N2 (total occurrences) and
   n1/n2 (unique counts) separately, as required by Halstead (1977)
 - Expanded operator detection in `CodeAnalyzer` to cover bitwise, boolean,
@@ -82,6 +87,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Duplicate `bandit` and other entries removed from `requirements.txt`
 
 ### Changed
+
 - `datasets/` directory restructured: AI samples organised under
   `datasets/ai_samples/<model>/` and human baseline under
   `datasets/human_samples/`
@@ -93,6 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0] — 2026-02-28
 
 ### Added
+
 - Full `pytest` test suite in `tests/test_analyzer.py` covering Halstead
   metrics, bad practice detection, and docstring coverage across 15 test cases
 - `tests/test_core.py` with smoke tests for credential detection and docstring
@@ -101,6 +108,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   both `import x` and `from x import y` forms
 
 ### Fixed
+
 - `CodeExecutor` resource limiting now skips `preexec_fn` on Windows (`os.name
   == 'nt'`) and when the `resource` module is unavailable, preventing import
   errors on non-Unix platforms
@@ -108,6 +116,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   reducing false positives on short string assignments
 
 ### Changed
+
 - `core/reporter.py` updated to handle `"Error"` strings in numeric fields
   gracefully when computing averages for the leaderboard summary table
 
@@ -116,6 +125,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] — 2026-02-24
 
 ### Added
+
 - Initial public release of VibeBench
 - `core/analyzer.py`: AST-based static analysis engine implementing:
   - Halstead Volume and Vocabulary metrics
@@ -142,9 +152,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-
-
-[Unreleased]: https://github.com/umayer16/VIBEBENCH/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/umayer16/VIBEBENCH/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/umayer16/VIBEBENCH/releases/tag/v1.3.0
 [1.2.0]: https://github.com/umayer16/VIBEBENCH/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/umayer16/VIBEBENCH/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/umayer16/VIBEBENCH/releases/tag/v1.0.0
