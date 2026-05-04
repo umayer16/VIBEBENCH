@@ -148,7 +148,7 @@ def run_generator(tasks_file, model_name, output_dir="datasets"):
             failed += 1
 
     print(f"\n✅ Generation complete: {success} succeeded, {failed} failed.")
-    print(f"\nRun VibeBench to analyze results:")
+    print("\nRun VibeBench to analyze results:")
     print(f"  python vibebench.py benchmark --tasks {tasks_file}")
 
 

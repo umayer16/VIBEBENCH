@@ -8,7 +8,9 @@ try:
 except ImportError:
     resource = None
 
+
 class CodeExecutor:
+
     """
     Handles the dynamic execution of Python scripts in a sandboxed-style environment
     using Unix resource limits to ensure operational safety.
@@ -17,13 +19,12 @@ class CodeExecutor:
     def __init__(self, timeout=5, memory_limit_mb=512):
         """
         Initializes the executor with specific safety constraints.
-
         Args:
             timeout (int): Maximum CPU time allowed in seconds.
             memory_limit_mb (int): Maximum memory allowed in megabytes.
         """
         self.timeout = timeout
-        self.memory_limit = memory_limit_mb * 1024 * 1024 
+        self.memory_limit = memory_limit_mb * 1024 * 1024
 
     def _limit_resources(self):
         """Sets hard CPU and memory limits on the child process (Unix-only)."""
@@ -34,10 +35,8 @@ class CodeExecutor:
     def run(self, file_path):
         """
         Executes a Python file and captures its performance metrics.
-
         Args:
             file_path (str): The path to the script to execute.
-
         Returns:
             dict: Metrics including status, execution time, and potential errors.
         """
