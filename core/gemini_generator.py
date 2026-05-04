@@ -17,6 +17,7 @@ import re
 
 
 def generate_code_gemini(prompt, model_name="gemini-1.5-flash"):
+
     """
     Sends a code generation prompt to the Gemini API and returns
     the generated Python code as a string.
@@ -30,7 +31,6 @@ def generate_code_gemini(prompt, model_name="gemini-1.5-flash"):
     """
     try:
         from google import genai
-        from google.genai import types
     except ImportError:
         raise ImportError(
             "google-genai is not installed. "
@@ -67,12 +67,11 @@ def generate_code_gemini(prompt, model_name="gemini-1.5-flash"):
 
 
 def load_tasks(tasks_file):
+
     """
     Loads benchmark tasks from a JSON file.
-
     Args:
         tasks_file (str): Path to the tasks JSON file.
-
     Returns:
         list: A list of task dicts with 'name' and 'prompt' keys.
     """
@@ -81,9 +80,9 @@ def load_tasks(tasks_file):
 
 
 def save_generated_code(code, model_name, task_name, output_dir="datasets"):
+
     """
     Saves generated code to the datasets directory under a model-named subfolder.
-
     Args:
         code (str): The generated Python code.
         model_name (str): The model name (used as subfolder name).
@@ -107,6 +106,7 @@ def save_generated_code(code, model_name, task_name, output_dir="datasets"):
 
 
 def run_generator(tasks_file, model_name, output_dir="datasets"):
+
     """
     Main generation loop — loads tasks, calls Gemini, saves outputs.
 
@@ -117,10 +117,8 @@ def run_generator(tasks_file, model_name, output_dir="datasets"):
     """
     tasks = load_tasks(tasks_file)
     print(f"\n🤖 Generating code with {model_name} for {len(tasks)} tasks...\n")
-
     success = 0
     failed = 0
-
     for task in tasks:
         # Support both 'name' and 'id' as task identifier
         name = task.get("name") or task.get("id", "unnamed_task")
@@ -146,10 +144,12 @@ def run_generator(tasks_file, model_name, output_dir="datasets"):
             failed += 1
 
     print(f"\n✅ Generation complete: {success} succeeded, {failed} failed.")
-    print(f"\nRun VibeBench to analyze results:")
+    print("\nRun VibeBench to analyze results:")
     print(f"  python vibebench.py benchmark --tasks {tasks_file}")
 
+
 def main():
+
     parser = argparse.ArgumentParser(
         prog="gemini_generator",
         description="Generate benchmark code solutions using Google Gemini."

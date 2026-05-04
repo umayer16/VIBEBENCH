@@ -67,7 +67,7 @@ class CodeAnalyzer:
         # Halstead primitives
         n1 = len(operator_counts)          # unique operators
         n2 = len(operand_counts)           # unique operands
-        N1 = sum(operator_counts.values()) # total operator occurrences
+        N1 = sum(operator_counts.values())   # total operator occurrences
         N2 = sum(operand_counts.values())  # total operand occurrences
 
         vocabulary = n1 + n2
@@ -182,7 +182,7 @@ class CodeAnalyzer:
             complexity (float): Cyclomatic complexity of the file (M).
             docstring_coverage (float): Docstring coverage 0-100.
             execution_time (float): Execution time of this file in seconds.
-            baseline_execution_time (float): Execution time of human 
+            baseline_execution_time (float): Execution time of human
                 baseline in seconds.
             all_complexities (list): All complexity values in the benchmark
                 run, used for min-max normalisation. If None, normalisation
@@ -190,9 +190,9 @@ class CodeAnalyzer:
             all_exec_times (list): All execution times in the benchmark run,
                 used for min-max normalisation. If None, skipped.
             w1 (float): Weight for Halstead Volume component (default 0.4).
-            w2 (float): Weight for Cyclomatic Complexity component 
+            w2 (float): Weight for Cyclomatic Complexity component
                 (default 0.4).
-            w3 (float): Weight for Operational Parity component 
+            w3 (float): Weight for Operational Parity component
                 (default 0.2).
 
         Returns:
@@ -212,19 +212,16 @@ class CodeAnalyzer:
 
         # --- Halstead Volume (V_hat) ---
         # Use Halstead volume from the AST if available, else use 0
-        halstead = self.calculate_halstead_metrics()
-        if isinstance(halstead, dict):
-            volume = halstead.get("volume", 0)
-        else:
-            volume = 0
-
+        # halstead = self.calculate_halstead_metrics()
         # Min-max normalise volume
         if all_complexities and len(all_complexities) > 1:
 
             v_min = min(all_complexities)
             v_max = max(all_complexities)
-            v_hat = ((complexity - v_min) / (v_max - v_min)
-                    if v_max != v_min else 0.0)
+            v_hat = (
+                (complexity - v_min) / (v_max - v_min)
+                if v_max != v_min else 0.0
+            )
         else:
             # Fallback: normalise against McCabe threshold of 10
             v_hat = min(complexity / 10.0, 1.0)
@@ -233,8 +230,10 @@ class CodeAnalyzer:
         if all_complexities and len(all_complexities) > 1:
             c_min = min(all_complexities)
             c_max = max(all_complexities)
-            m_hat = ((complexity - c_min) / (c_max - c_min)
-                    if c_max != c_min else 0.0)
+            m_hat = (
+                (complexity - c_min) / (c_max - c_min)
+                if c_max != c_min else 0.0
+            )
         else:
             m_hat = min(complexity / 10.0, 1.0)
 

@@ -1,4 +1,5 @@
 # VibeBench Leaderboard
+
 *Last updated: March 9, 2026 — v1.1.0*
 
 Benchmark results across 5 tasks covering Data Structures, Cybersecurity,
@@ -10,7 +11,8 @@ the reference baseline.
 ## Overall Results
 
 | Rank | Model | Avg Complexity | Avg Docstring Coverage | Bad Practices | Success Rate | Avg Execution Time |
-|------|-------|---------------|----------------------|---------------|--------------|-------------------|
+|------|-------|---------------|----------------------|---------------|--------------|
+-------------------|
 | 🥇 1 | **ChatGPT** | 4.76 | 80.0% | 0 | 5/5 (100%) | 0.111s |
 | 🥈 2 | **Gemini** | 3.90 | 95.0% | 0 | 5/5 (100%) | 0.109s |
 | 🥉 3 | **Claude** | 3.77 | 0.0% | 0 | 4/5 (80%) | 0.131s |
@@ -26,6 +28,7 @@ the reference baseline.
 ### TASK-001: Reverse a Linked List (Data Structures — Easy)
 
 | Model | Complexity | Docstring Coverage | Bad Practices | Status | Execution Time |
+
 |-------|-----------|-------------------|---------------|--------|----------------|
 | ChatGPT | 1.8 | 0.0% | 0 | ✅ Success | 0.060s |
 | Claude | 2.0 | 0.0% | 0 | ✅ Success | 0.047s |
@@ -38,6 +41,7 @@ the reference baseline.
 ### TASK-002: SSL Certificate Checker (Cybersecurity — Medium)
 
 | Model | Complexity | Docstring Coverage | Bad Practices | Status | Execution Time |
+
 |-------|-----------|-------------------|---------------|--------|----------------|
 | ChatGPT | 7.0 | 100.0% | 0 | ✅ Success | 0.387s |
 | Claude | 6.5 | 0.0% | 0 | ✅ Success | 0.397s |
@@ -50,6 +54,7 @@ the reference baseline.
 ### TASK-003: Dijkstra's Algorithm (Algorithms — Hard)
 
 | Model | Complexity | Docstring Coverage | Bad Practices | Status | Execution Time |
+
 |-------|-----------|-------------------|---------------|--------|----------------|
 | ChatGPT | 6.0 | 100.0% | 0 | ✅ Success | 0.050s |
 | Claude | 4.67 | 0.0% | 0 | ✅ Success | 0.054s |
@@ -62,6 +67,7 @@ the reference baseline.
 ### TASK-004: CSV Average Calculator (File I/O — Easy)
 
 | Model | Complexity | Docstring Coverage | Bad Practices | Status | Execution Time |
+
 |-------|-----------|-------------------|---------------|--------|----------------|
 | ChatGPT | 6.0 | 100.0% | 0 | ✅ Success | 0.050s |
 | Claude | 3.33 | 0.0% | 0 | ✅ Success | 0.055s |
@@ -74,6 +80,7 @@ the reference baseline.
 ### TASK-005: Fibonacci with Memoization (Math/Logic — Medium)
 
 | Model | Complexity | Docstring Coverage | Bad Practices | Status | Execution Time |
+
 |-------|-----------|-------------------|---------------|--------|----------------|
 | ChatGPT | 3.0 | 100.0% | 0 | ✅ Success | 0.048s |
 | Claude | 2.33 | 0.0% | 0 | ❌ Runtime Error | 0.102s |
@@ -99,6 +106,7 @@ the reference baseline.
 ## Methodology
 
 All models were evaluated on identical tasks using VibeBench v1.1.0. Metrics collected:
+
 - **Cyclomatic Complexity** via `radon`
 - **Docstring Coverage** via AST analysis
 - **Bad Practices** via heuristic detection

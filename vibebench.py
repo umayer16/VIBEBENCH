@@ -126,8 +126,8 @@ class VibeBench:
 
                     # Use None instead of "Error" for missing numeric fields
                     raw_exec_time = exec_metrics.get("execution_time")
-                    execution_time_sec = raw_exec_time if isinstance(raw_exec_time, (int, float)) else None
-
+                    is_valid_time = isinstance(raw_exec_time, (int, float))
+                    execution_time_sec = raw_exec_time if is_valid_time else None
                     doc_coverage = analyzer.get_docstring_coverage()
 
                     # Extract task ID from filename for baseline lookup
@@ -202,7 +202,7 @@ class VibeBench:
             reporter.generate_markdown()
         except Exception as e:
             print(f"⚠️  Leaderboard generation failed: {e}")
-            print(f"   You can generate it manually: python core/reporter.py")
+            print("   You can generate it manually: python core/reporter.py")
 
 
 def main():
