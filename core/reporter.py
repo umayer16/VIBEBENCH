@@ -69,7 +69,7 @@ class VibeReporter:
 
             if m not in models:
                 models[m] = {
-                    "comp": [], "time": [], "docs": [], 
+                    "comp": [], "time": [], "docs": [],
                     "bugs": 0, "success": 0, "total": 0
                 }
                 models[m]["total"] += 1
