@@ -1,6 +1,6 @@
 # VibeBench Leaderboard
 
-*Last updated: March 9, 2026 — v1.1.0*
+## last updated: March 9, 2026 — v1.1.0
 
 Benchmark results across 5 tasks covering Data Structures, Cybersecurity,
 Algorithms, File I/O, and Math/Logic. Human-authored solutions serve as
