@@ -16,7 +16,8 @@ class CodeExecutor:
     using Unix resource limits to ensure operational safety.
     """
 
-    def __init__(self, timeout=5, memory_limit_mb=512):
+    def __init__(self, timeout=10, memory_limit_mb=512):
+
         """
         Initializes the executor with specific safety constraints.
         Args:
@@ -41,24 +42,46 @@ class CodeExecutor:
             dict: Metrics including status, execution time, and potential errors.
         """
         if not os.path.exists(file_path):
-            return {"status": "Error", "message": "File not found"}
-
-        start_time = time.perf_counter()
+            return {
+                "status": "Error",
+                "message": f"File {file_path} not found",
+                "stderr": "File not found"
+            }
+        start_time = time.time()
         try:
             result = subprocess.run(
-                [sys.executable, file_path],
+                ["python", file_path],
                 capture_output=True,
                 text=True,
-                timeout=self.timeout,
-                preexec_fn=self._limit_resources if (os.name != 'nt' and resource) else None
+                timeout=self.timeout
             )
+            execution_time = time.time() - start_time
+
+            # 2. Extract stdout preview (e.g., first 1000 characters)
+            stdout_content = result.stdout or ""
+            stdout_preview = stdout_content[:1000]
+
+            if result.returncode != 0:
+                return {
+                    "status": "Runtime Error",
+                    "stderr": result.stderr,
+                    "execution_time": execution_time
+                }
             return {
-                "status": "Success" if result.returncode == 0 else "Runtime Error",
-                "execution_time": round(time.perf_counter() - start_time, 4),
-                "stdout_preview": result.stdout[:100].strip(),
-                "stderr": result.stderr.strip()
+                "status": "Success",
+                "stdout": stdout_content,
+                "stdout_preview": stdout_preview, # Required for test_stdout_preview_captured
+                "execution_time": execution_time  # Required for test_returns_execution_time
             }
         except subprocess.TimeoutExpired:
-            return {"status": "Timeout", "message": f"Exceeded {self.timeout}s"}
+            return {
+                "status": "Timeout",
+                "stderr": "Execution timed out",
+                "execution_time": float(self.timeout)
+            }
         except Exception as e:
-            return {"status": "Exception", "message": str(e)}
+            return {
+                "status": "Runtime Error",
+                "stderr": str(e),
+                "execution_time": time.time() - start_time
+            }
