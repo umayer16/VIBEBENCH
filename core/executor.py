@@ -1,6 +1,5 @@
 import subprocess
 import time
-import sys
 import os
 
 try:
@@ -70,8 +69,8 @@ class CodeExecutor:
             return {
                 "status": "Success",
                 "stdout": stdout_content,
-                "stdout_preview": stdout_preview, # Required for test_stdout_preview_captured
-                "execution_time": execution_time  # Required for test_returns_execution_time
+                "stdout_preview": stdout_preview,  # Required for test_stdout_preview_captured
+                "execution_time": execution_time   # Required for test_returns_execution_time
             }
         except subprocess.TimeoutExpired:
             return {
