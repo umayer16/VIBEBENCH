@@ -28,7 +28,10 @@ class VibeReporter:
         for entry in self.data:
             m = entry.get('model', 'Unknown')
             if m not in models:
-                models[m] = {"comp": [], "time": [], "docs": [], "bugs": 0}
+                models[m] = {
+                    "comp": [], "time": [], "docs": [],
+                    "bugs": 0, "success": 0, "total": 0
+                }
 
             # Handle potential 'Error' strings in numeric fields
             comp = entry.get('complexity')
@@ -72,7 +75,8 @@ class VibeReporter:
                     "comp": [], "time": [], "docs": [],
                     "bugs": 0, "success": 0, "total": 0
                 }
-                models[m]["total"] += 1
+            models[m]["bugs"] += entry.get('bad_practices_count', 0)
+            models[m]["total"] += 1
             if entry.get('status') == 'Success':
                 models[m]["success"] += 1
 
