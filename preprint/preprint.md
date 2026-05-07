@@ -160,8 +160,7 @@ capabilities — from simple data structure manipulation to
 asynchronous network programming.
 
 | Task ID | Category | Difficulty | Description |
-|---------|----------|------------|-------------|
-
+| --------- | ---------- | ------------ | ------------- |
 | TASK-001 | Data Structures | Easy | Reverse a linked list |
 | TASK-002 | Cybersecurity | Medium | SSL certificate expiry checker |
 | TASK-003 | Algorithms | Hard | Dijkstra's shortest path |
@@ -185,8 +184,7 @@ We evaluate six LLM-generated solutions per task alongside one
 human-authored baseline, for a total of seven solution sets:
 
 | Model | Provider | Access Method |
-
-|-------|----------|--------------|
+| ------- | ---------- | -------------- |
 | ChatGPT (GPT-4o) | OpenAI | Web interface |
 | Claude (Claude 3.5 Sonnet) | Anthropic | Web interface |
 | Gemini (Gemini 1.5 Flash) | Google | Web interface / API |
