@@ -1,7 +1,7 @@
 import json
 import os
 import glob
-from datetime import datetime  # FIXED: Moved from __main__ to top level for global access
+from datetime import datetime
 
 
 class VibeReporter:
@@ -20,8 +20,9 @@ class VibeReporter:
             return
 
         md_content = "# 🏆 AI Code Quality Leaderboard\n"
-        # Accessing datetime here now works regardless of how the script is run
-        md_content += f"**Report Date:** {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
+        md_content += (
+            f"**Report Date:** {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
+        )
 
         # 1. Aggregate stats per model
         models = {}
@@ -33,7 +34,6 @@ class VibeReporter:
                     "bugs": 0, "success": 0, "total": 0
                 }
 
-            # Handle potential 'Error' strings in numeric fields
             comp = entry.get('complexity')
             if isinstance(comp, (int, float)):
                 models[m]["comp"].append(comp)
@@ -47,59 +47,87 @@ class VibeReporter:
                 models[m]["docs"].append(doc_cov)
 
             models[m]["bugs"] += entry.get('bad_practices_count', 0)
+            models[m]["total"] += 1
+            if entry.get('status') == 'Success':
+                models[m]["success"] += 1
 
-        # 2. Summary Leaderboard Table
-        md_content += "## 📈 Model Comparison Summary\n"
+        # 2. Summary Leaderboard Table — sorted by success rate descending
+        md_content += "## 📈 Model Comparison Summary\n\n"
         md_content += (
-            "| Model | Avg Complexity | Avg Exec Time | Doc Coverage | Total Bad Practices |\n"
+            "| Rank | Model | Avg Complexity | Avg Exec Time | "
+            "Avg Doc Coverage | Bad Practices | Success Rate |\n"
         )
-        md_content += "| :--- | :---: | :---: | :---: | :---: |\n"
+        md_content += (
+            "| :---: | :--- | :---: | :---: | :---: | :---: | :---: |\n"
+        )
 
-        # Sort models by success rate descending, then by avg complexity ascending
         sorted_models = sorted(
             models.items(),
             key=lambda x: (
-
                 -(x[1]["success"] / x[1]["total"] if x[1]["total"] > 0 else 0),
                 sum(x[1]["comp"]) / len(x[1]["comp"]) if x[1]["comp"] else 0
             )
         )
 
+        rank = 1
         for m, stats in sorted_models:
-            avg_c = sum(stats["comp"]) / len(stats["comp"]) if stats["comp"] else 0
-            avg_t = sum(stats["time"]) / len(stats["time"]) if stats["time"] else 0
-            avg_d = sum(stats["docs"]) / len(stats["docs"]) if stats["docs"] else 0
-
-            if m not in models:
-                models[m] = {
-                    "comp": [], "time": [], "docs": [],
-                    "bugs": 0, "success": 0, "total": 0
-                }
-            models[m]["bugs"] += entry.get('bad_practices_count', 0)
-            models[m]["total"] += 1
-            if entry.get('status') == 'Success':
-                models[m]["success"] += 1
-
-            success_rate = (stats["success"] / stats["total"] * 100) if stats["total"] > 0 else 0
-            md_content += (
-                f"| {m.upper()} | {avg_c:.2f} | {avg_t:.4f}s |"
-                f"{avg_d:.1f}% | {stats['bugs']} | {success_rate:.1f}% |\n"
+            avg_c = (
+                round(sum(stats["comp"]) / len(stats["comp"]), 2)
+                if stats["comp"] else 0
             )
-        # 3.Data Table
-        md_content += "\n## 🔍 Detailed File Analysis\n"
+            avg_t = (
+                round(sum(stats["time"]) / len(stats["time"]), 4)
+                if stats["time"] else 0
+            )
+            avg_d = (
+                round(sum(stats["docs"]) / len(stats["docs"]), 1)
+                if stats["docs"] else 0
+            )
+            success_rate = (
+                f"{stats['success']}/{stats['total']}"
+                if stats["total"] > 0 else "0/0"
+            )
+
+            rank_str = "—" if m == "human_samples" else str(rank)
+            if m != "human_samples":
+                rank += 1
+
+            md_content += (
+                f"| {rank_str} | {m.upper()} | {avg_c} | {avg_t}s | "
+                f"{avg_d}% | {stats['bugs']} | {success_rate} |\n"
+            )
+
+        # 3. Detailed File Analysis Table
+        md_content += "\n## 🔍 Detailed File Analysis\n\n"
         md_content += (
-            "| Model | Avg Complexity | Avg Exec Time | "
-            "Doc Coverage | Total Bad Practices | Success Rate |\n"
+            "| Model | File | Complexity | Exec Time | "
+            "Doc Coverage | Bad Practices | Status |\n"
         )
-        md_content += "| :--- | :---: | :---: | :---: | :---: | :---: |\n"
+        md_content += (
+            "| :--- | :--- | :---: | :---: | :---: | :---: | :---: |\n"
+        )
 
         for entry in self.data:
-            md_content += (
-                f"| {entry.get('model', 'N/A').upper()} | {entry['file']} | "
-                f"{entry['complexity']} | {entry['execution_time_sec']}s | "
-                f"{entry['status']} |\n"
-
+            model = entry.get('model', 'N/A').upper()
+            fname = entry.get('file', 'N/A')
+            comp = entry.get('complexity', 'N/A')
+            exec_t = entry.get('execution_time_sec')
+            exec_t_str = (
+                f"{exec_t:.4f}s" if isinstance(exec_t, (int, float)) else "N/A"
             )
+            doc_cov = entry.get('docstring_coverage')
+            doc_cov_str = (
+                f"{doc_cov:.1f}%"
+                if isinstance(doc_cov, (int, float)) else "N/A"
+            )
+            bad = entry.get('bad_practices_count', 0)
+            status = entry.get('status', 'N/A')
+
+            md_content += (
+                f"| {model} | {fname} | {comp} | {exec_t_str} | "
+                f"{doc_cov_str} | {bad} | {status} |\n"
+            )
+
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(md_content)
 
@@ -107,11 +135,9 @@ class VibeReporter:
 
 
 if __name__ == "__main__":
-    # Automatically find the latest multi-model report
     json_files = glob.glob("vibebench_multimodel_*.json")
 
     if json_files:
-        # Sorts by creation time to find the newest one
         latest_report = max(json_files, key=os.path.getctime)
         print(f"📄 Processing latest report: {latest_report}")
 

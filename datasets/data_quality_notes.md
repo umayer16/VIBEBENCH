@@ -14,6 +14,7 @@ of the published benchmark results.
 **Severity:** Medium
 
 ### Description
+
 This file contains Dijkstra shortest path implementation code
 rather than a CSV average calculator as required by TASK-004.
 This appears to be a data collection error where the ChatGPT
@@ -21,22 +22,25 @@ output for TASK-003 was accidentally saved under the TASK-004
 filename.
 
 ### Evidence
-- The file imports `heapq` and implements `dijkstra()` — 
+
+- The file imports `heapq` and implements `dijkstra()` —
   consistent with TASK-003 (Algorithms)
 - The file contains no CSV reading, no file I/O operations,
-  and no average calculation — inconsistent with TASK-004 
+  and no average calculation — inconsistent with TASK-004
   (File I/O)
 - The benchmark result for this file shows `Status: Success`
   because the Dijkstra code runs correctly, but it is testing
   the wrong capability
 
 ### Impact on Published Results
+
 The TASK-004 ChatGPT result in the v1.2.0 leaderboard reflects
 execution of Dijkstra code, not CSV processing. The complexity
 score (6.0) and execution time (0.050s) are valid measurements
 of the wrong program.
 
 ### Decision
+
 The file is preserved as-is to maintain reproducibility of the
 published v1.2.0 results. A corrected file will be collected
 and added as `TASK-004_chatgpt_v2.py` in a future benchmark
@@ -51,7 +55,8 @@ in v2.0.0.
 **Discovered:** May 2026 (GitHub Issue #6)  
 **Severity:** Low
 
-### Description
+### Description2
+
 The Gemini TASK-004 solution reads the CSV file but does not
 skip the header row. The string 'Price' (the column header)
 causes a `ValueError` when parsed as float, which is silently
@@ -59,9 +64,12 @@ caught and skipped. The average is therefore calculated only
 over the numeric rows, which happens to produce the correct
 result — but for the wrong reason.
 
-### Evidence
+### Evidence2
+
 Looking at `TASK-004_ai.py`:
+
 ```python
+
 for row in reader:
     if len(row) >= 2:
         try:
@@ -71,15 +79,31 @@ for row in reader:
             continue  # silently skips header
 ```
 
-### Impact on Published Results
+### Impact on Published Results2
+
 The benchmark result shows `Status: Success` which is technically
 correct — the output file contains the right answer. However the
 implementation is fragile: if the header value happened to be
 numeric it would be incorrectly included in the average.
 
-### Decision
+### Decision2
+
 The file is preserved as-is. This is documented as a known
 fragility in the Gemini solution. VibeBench's static analysis
 does not currently detect this pattern — a future heuristic
 improvement could flag CSV reading without explicit header
 handling.
+
+## Issue DQ-003: [describe issue]
+
+**File:** `datasets/ai_samples/<model>/TASK-00X_<model>.py`
+**Discovered:** May 2026
+**Severity:** Low/Medium/High
+
+### Description3
+
+[What is wrong]
+
+### Decision3
+
+[What you did about it]

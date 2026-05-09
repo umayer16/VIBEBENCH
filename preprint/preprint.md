@@ -200,6 +200,12 @@ Solutions were saved verbatim without manual correction, with
 the exception of one known data collection error documented in
 `datasets/data_quality_notes.md` (DQ-001).
 
+For the extended task set (TASK-006 through TASK-010), outputs were
+collected from three models — ChatGPT, Gemini, and Claude — which
+achieved the highest success rates in the initial five-task evaluation.
+Full seven-model evaluation across all ten tasks is planned for a
+future release of the benchmark dataset.
+
 ## 3.4 Metrics
 
 VibeBench computes five primary metrics per file:

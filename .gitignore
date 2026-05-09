@@ -23,7 +23,9 @@ env/
 Thumbs.db
 
 # VibeBench output files (optional — remove if you want to commit results)
+# VibeBench output files — exclude auto-generated reports
 vibebench_multimodel_*.json
+vibebench_multimodel_*.csv
 ```
 
 Commit directly to main with message:
