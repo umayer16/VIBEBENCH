@@ -1,6 +1,7 @@
 import json
 import os
 
+
 def read_and_validate_json(filepath, required_keys):
     # HUMAN TOUCH: Explicit error handling, returns None on failure
     if not os.path.exists(filepath):
@@ -15,9 +16,19 @@ def read_and_validate_json(filepath, required_keys):
         return None, f"Missing keys: {missing}"
     return data, None
 
+
 if __name__ == "__main__":
-    data, error = read_and_validate_json('sample.json', ['name', 'version'])
+    # Create a temporary test file so the script is self-contained
+    test_file = "sample_test.json"
+    with open(test_file, 'w') as f:
+        json.dump({"name": "test", "version": "1.0"}, f)
+
+    data, error = read_and_validate_json(test_file, ['name', 'version'])
     if error:
         print(f"Error: {error}")
     else:
         print(f"Valid: {data}")
+
+    # Clean up
+    if os.path.exists(test_file):
+        os.remove(test_file)
