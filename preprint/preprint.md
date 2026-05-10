@@ -287,7 +287,143 @@ execution environments.
 
 ## 4. Results
 
+### 4.1 Overall Model Performance
+
+Table 1 presents the aggregate performance of all seven evaluated
+systems across the ten benchmark tasks. ChatGPT and Gemini achieved
+the highest success rates (9/10, 90%), with failures limited to
+TASK-010 (async HTTP GET). Claude achieved 7/10 (70%), with
+additional failures on TASK-005 (Fibonacci memoization) and
+TASK-007 (merge sort). Grok and DeepSeek were evaluated only on
+the original five tasks, achieving 1/5 (20%) and 2/5 (40%)
+respectively — consistent with their performance in the initial
+benchmark round.
+
+### Table 1: Overall Model Performance Summary
+
+| Model | Tasks Evaluated | Success Rate | Avg Complexity | Avg Doc Coverage | Bad Practices |
+| ------- | ---------------- | ------------- | ---------------- | ----------------- | --------------- |
+| ChatGPT | 10 | 9/10 (90%) | 4.28 | 65.0% | 0 |
+| Gemini | 10 | 9/10 (90%) | 4.15 | 87.5% | 0 |
+| Claude | 10 | 7/10 (70%) | 3.78 | 20.0% | 1 |
+| LLaMA 3.3 70B | 5 | 4/5 (80%) | 5.30 | 0.0% | 1 |
+| DeepSeek | 5 | 2/5 (40%) | 4.65 | 93.1% | 1 |
+| Grok | 5 | 1/5 (20%) | 5.24 | 82.0% | 0 |
+| Human Baseline | 10 | 9/10 (90%) | 3.55 | 10.0% | 0 |
+
+### 4.2 Finding 1: Universal Failure on Asynchronous Tasks
+
+TASK-010 (async HTTP GET using aiohttp) produced a Runtime Error
+for every AI model evaluated — ChatGPT, Gemini, and Claude all
+failed this task despite succeeding on nine of the other nine tasks.
+The human baseline succeeded, producing a minimal but correct async
+implementation with explicit timeout and error handling.
+
+Inspection of the failing AI outputs revealed a common pattern:
+all three models generated syntactically valid Python code that
+uses `aiohttp` correctly but fails at runtime because `aiohttp`
+is not installed in the benchmark execution environment. This
+reveals a systematic assumption in LLM outputs about the
+availability of third-party libraries — an assumption that does
+not hold in sandboxed execution environments and would similarly
+not hold in many production deployment contexts.
+
+This finding demonstrates a category of failure invisible to
+HumanEval-style benchmarks, which typically test code in
+pre-configured environments with all dependencies installed.
+
+### 4.3 Finding 2: Documentation Gap Persists Across Task Types
+
+Claude produced 0% docstring coverage on seven of ten tasks
+(TASK-001 through TASK-007), with docstrings appearing only on
+TASK-008 and TASK-009. This pattern is consistent with the
+original five-task benchmark and extends across both easy and
+medium difficulty tasks. Gemini maintained high docstring coverage
+(87.5% average) across all ten tasks, while ChatGPT showed
+variable coverage (65.0% average), with docstrings present on
+five of ten tasks.
+
+LLaMA 3.3 70B produced 0% docstring coverage across all five
+evaluated tasks, matching Claude's pattern despite being a
+different model family. This suggests the documentation gap is
+not model-specific but reflects a broader tendency in LLM code
+generation to prioritise functional implementation over
+documentation.
+
+### 4.4 Finding 3: Human Baseline Achieves Lowest Complexity
+
+The human baseline achieved the lowest average cyclomatic
+complexity (3.55) across all evaluated systems. ChatGPT had the
+highest complexity among the three models evaluated on all ten
+tasks (4.28), followed by Gemini (4.15) and Claude (3.78). This
+over-engineering tendency — where AI-generated solutions introduce
+more control flow paths than human solutions to the same problem
+— was consistent across both easy and medium difficulty tasks.
+
+### 4.5 Finding 4: Bad Practice Detection Catches Real Failures
+
+VibeBench's bad practice heuristics detected mutable default
+arguments in Claude's TASK-005 output (the `memo={}` pattern),
+DeepSeek's TASK-005 output, and LLaMA's task-005 output. In all
+three cases, the bad practice detection corresponded directly with
+a Runtime Error status, validating that the heuristic identifies
+genuinely problematic patterns rather than false positives.
+
+DeepSeek's TASK-004 output also triggered a bad practice finding
+related to an interactive `input()` call inside the `__main__`
+block — a pattern that causes the benchmark executor to hang,
+resulting in a Timeout status.
+
 ## 5. Discussion
+
+The results demonstrate that functional correctness benchmarks
+provide an incomplete picture of LLM code quality. All three
+models evaluated on the full ten-task suite passed nine of ten
+tasks by the correctness criterion — yet the same outputs reveal
+meaningful variation in complexity, documentation, and robustness
+that would affect production deployment decisions.
+
+The universal failure on TASK-010 is particularly instructive.
+The failing code is not syntactically wrong — it would pass a
+code review focused on correctness. The failure is environmental:
+the code assumes a dependency that is not present. This class of
+failure is common in production deployments where AI-generated
+code is moved from a development environment (where the developer
+has installed dependencies) to a production environment (where
+they may not be present). VibeBench's sandboxed execution catches
+this category of failure; HumanEval does not.
+
+The documentation gap finding has direct implications for
+AI-assisted software development workflows. Code that lacks
+docstrings creates maintenance burden — future developers cannot
+understand function contracts without reading the implementation.
+Claude's pattern of 0% docstring coverage on most tasks, despite
+high functional success rates, suggests that prompts for code
+generation should explicitly request documentation as a separate
+concern from functional correctness.
+
+The over-engineering tendency — higher average complexity in
+AI-generated code than in human-authored solutions — is consistent
+with prior observations that LLMs tend to generate more verbose
+and structurally complex solutions than necessary. For simple
+tasks (TASK-001, TASK-006, TASK-009) where human solutions
+achieve complexity scores of 1.0, AI solutions consistently score
+higher (2.0–4.0), suggesting unnecessary branching or defensive
+programming patterns.
+
+The VibeBench Score provides a single composite metric that
+combines these dimensions. In our evaluation, Gemini achieves
+the highest overall quality profile: competitive success rate,
+low complexity, and high documentation coverage. This multi-dimensional
+view is more informative than a success rate alone — a model that
+passes all tasks with high complexity and no documentation is
+arguably less production-ready than one that fails one task but
+produces clean, documented code on the others.
+
+These findings suggest that the field would benefit from
+standardised holistic evaluation as a complement to functional
+correctness benchmarks, particularly as LLM-generated code moves
+increasingly into production software systems.
 
 ## 6. Limitations
 
