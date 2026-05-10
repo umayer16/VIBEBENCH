@@ -21,3 +21,20 @@ findings from evaluating 7 LLMs across 10 benchmark tasks using
 static quality metrics and sandboxed dynamic execution. The core
 research question is: do current LLM evaluation benchmarks
 adequately capture the production-readiness of generated code?
+
+## Status
+
+**DRAFT COMPLETE** — All 9 sections written. Final proofread
+in progress before arXiv submission.
+
+| Section | Status |
+| --------- | -------- |
+| Abstract | ✅ Complete |
+| 1. Introduction | ✅ Complete |
+| 2. Related Work | ✅ Complete |
+| 3. Methodology | ✅ Complete |
+| 4. Results | ✅ Complete |
+| 5. Discussion | ✅ Complete |
+| 6. Limitations | ✅ Complete |
+| 7. Conclusion | ✅ Complete |
+| References | ✅ Complete |
