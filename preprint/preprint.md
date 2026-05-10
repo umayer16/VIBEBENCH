@@ -10,7 +10,27 @@ keywords: LLM evaluation, code quality, static analysis, cyclomatic complexity, 
 
 ## Abstract
 
-## (To be written after Results section is complete)
+Large Language Models (LLMs) are increasingly used to generate
+production-bound code, yet dominant evaluation benchmarks such as
+HumanEval and MBPP assess only functional correctness — whether
+code passes unit tests — leaving code quality dimensions such as
+maintainability, documentation coverage, and runtime robustness
+unmeasured. We present VibeBench, an open-source Python framework
+that evaluates LLM-generated code holistically by integrating
+AST-based static analysis (Halstead Volume, Cyclomatic Complexity,
+docstring coverage, bad practice detection) with sandboxed dynamic
+execution under Unix resource limits. We evaluate seven systems —
+ChatGPT, Claude, Gemini, Grok, DeepSeek, LLaMA 3.3 70B, and a
+human baseline — across ten benchmark tasks spanning five
+programming categories. Our evaluation reveals four systematic
+findings: (1) all evaluated AI models fail a task requiring async
+HTTP operations with external dependencies, a failure class
+invisible to correctness-only benchmarks; (2) two of six LLMs
+produce zero docstring coverage despite high functional success
+rates; (3) AI models consistently over-engineer solutions relative
+to human baselines; and (4) static anti-pattern detection reliably
+predicts runtime failures. VibeBench and all benchmark data are
+publicly available at [VibeBench GitHub Repository](https://github.com/umayer16/VIBEBENCH)
 
 ## 1. Introduction
 
@@ -427,6 +447,97 @@ increasingly into production software systems.
 
 ## 6. Limitations
 
+This study is subject to several limitations that should be
+considered when interpreting the findings.
+
+**Task set scale.** The benchmark covers ten tasks — a meaningful
+expansion from the initial five, but modest compared to established
+benchmarks such as HumanEval (164 tasks) and MBPP (374 tasks).
+The findings reported here should be treated as preliminary
+indicators of systematic patterns rather than definitive claims
+about model behaviour across the full space of programming tasks.
+
+**Python-only evaluation.** All tasks and metrics are specific to
+Python. The documentation gap and over-engineering patterns
+observed may differ substantially in statically-typed languages
+such as Java or TypeScript, where compilers enforce structural
+constraints and type annotations provide an alternative form of
+documentation. Extending VibeBench to multi-language evaluation
+is a priority for future work.
+
+**Single-author human baseline.** The human baseline consists of
+solutions authored by one developer. Individual variation in
+coding style, complexity preference, and documentation habits
+means this baseline may not be representative of the broader
+population of experienced Python developers. A multi-author
+baseline aggregated across several developers would provide a
+more robust reference point.
+
+**Manual output collection.** LLM outputs were collected via web
+interfaces with default temperature settings and a single
+generation attempt per task. Repeated sampling would allow
+pass@k evaluation consistent with HumanEval methodology, and
+API-based collection would enable more systematic prompt
+engineering and reproducibility.
+
+**Dependency availability.** The TASK-010 failure across all AI
+models is attributable to `aiohttp` not being installed in the
+benchmark execution environment rather than errors in the
+generated code logic itself. Future benchmark runs should
+pre-install all task-relevant dependencies to isolate logical
+correctness from environmental factors.
+
+These limitations represent concrete directions for the next
+release of VibeBench and the benchmark dataset.
+
 ## 7. Conclusion
 
+This paper presented VibeBench, an open-source Python framework
+for the holistic evaluation of LLM-generated code, and reported
+findings from evaluating seven systems across ten benchmark tasks.
+
+Our evaluation reveals four systematic patterns in LLM-generated
+code quality that are invisible to functional correctness
+benchmarks. First, all evaluated AI models failed a task requiring
+async HTTP operations with external library dependencies —
+suggesting that sandboxed execution catches a category of
+real-world deployment failures that unit tests miss. Second, a
+significant documentation gap exists across models, with two of
+the six evaluated LLMs producing 0% docstring coverage despite
+high functional success rates. Third, AI models consistently
+produce code with higher cyclomatic complexity than human-authored
+solutions, indicating a systematic over-engineering tendency.
+Fourth, static heuristic detection of anti-patterns such as
+mutable default arguments reliably predicts runtime failures.
+
+Taken together, these findings suggest that functional correctness
+benchmarks provide an incomplete picture of LLM code quality for
+production deployment purposes. We argue that holistic evaluation
+— combining static quality metrics, dynamic execution, and
+comparison against a human baseline — should become a standard
+complement to pass@k evaluation in the LLM code generation
+literature.
+
+VibeBench is available at [VibeBench GitHub Repository](https://github.com/umayer16/VIBEBENCH)
+under the MIT License.
+
 ## References
+
+[chen2021] Chen, M., et al. (2021). Evaluating Large Language Models
+Trained on Code. arXiv:2107.03374.
+
+[austin2021] Austin, J., et al. (2021). Program Synthesis with Large
+Language Models. arXiv:2108.07732.
+
+[halstead1977] Halstead, M. H. (1977). Elements of Software Science.
+Elsevier.
+
+[mccabe1976] McCabe, T. J. (1976). A Complexity Measure. IEEE
+Transactions on Software Engineering, 2(4), 308-320.
+
+[husain2019] Husain, H., et al. (2019). CodeSearchNet Challenge.
+arXiv:1909.09436.
+
+[takerngsaksiri2025] Takerngsaksiri, W., Tantithamthavorn, C., Fu, M., Pasuksmit, J., Chen, K., & Wu, M. (2025). Code Readability in the Age of Large Language Models: An Industrial Case Study from Atlassian. arXiv.
+
+[li2025] Li, X., Ding, J., Peng, C., Zhao, B., Gao, X., Gao, H., & Gu, X. (2025). SafeGenBench: A Benchmark Framework for Security Vulnerability Detection in LLM-Generated Code. arXiv.

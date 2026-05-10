@@ -17,7 +17,7 @@ date: 6 March 2026
 bibliography: paper.bib
 ---
 
-# Summary
+## Summary
 
 The rapid integration of Large Language Models (LLMs) into the software
 development lifecycle has created a critical need for evaluation frameworks
@@ -43,20 +43,19 @@ introduced by autonomous agents. By grounding AI performance against a
 formalized Human Baseline, it provides the necessary metrics to determine if
 AI-generated code is truly production-ready.
 
-VibeBench is designed for three primary user groups. 
-AI researchers studying model evolution can use it to 
-conduct longitudinal studies comparing how code quality 
-changes across model versions. Software engineering teams 
-evaluating AI coding assistants for production deployment 
+VibeBench is designed for three primary user groups.
+AI researchers studying model evolution can use it to
+conduct longitudinal studies comparing how code quality
+changes across model versions. Software engineering teams
+evaluating AI coding assistants for production deployment
 can use it to audit technical debt before it accumulates
-Benchmark designers can use it as a foundation for 
-extending evaluation beyond functional correctness. The 
-framework is released under the MIT License and designed 
-to be extensible — new models, tasks, and heuristics can 
+Benchmark designers can use it as a foundation for
+extending evaluation beyond functional correctness. The
+framework is released under the MIT License and designed
+to be extensible — new models, tasks, and heuristics can
 be added without modifying the core pipeline.
 
-# Statement of need
-
+## Statement of need
 
 Current evaluation methodologies for Large Language Model (LLM) generated code,
 such as HumanEval [@chen2021codex] and MBPP [@austin2021program], primarily focus
@@ -91,7 +90,7 @@ scientific community to move toward a more holistic understanding of AI
 performance that prioritizes long-term software sustainability over short-term
 functional success.
 
-# State of the field
+## State of the field
 
 Several benchmarks and frameworks currently exist for evaluating the code
 generation capabilities of Large Language Models (LLMs). The most prominent
@@ -120,28 +119,28 @@ Unix-controlled dynamic resource limiting to audit the
 operational parity of LLM-synthesized software against
 a formalized human baseline.
 
-Existing static analysis tools such as Pylint and Bandit 
-focus on general Python code quality rather than on 
-patterns specific to LLM-generated outputs, and do not 
-integrate dynamic sandboxed execution or comparison 
+Existing static analysis tools such as Pylint and Bandit
+focus on general Python code quality rather than on
+patterns specific to LLM-generated outputs, and do not
+integrate dynamic sandboxed execution or comparison
 against a human baseline.
 
-# Software design
+## Software design
 
-VibeBench is designed as a modular, extensible pipeline 
-written in Python. The framework follows a 
-"Collector-Analyzer-Executor" architecture to ensure that 
-static heuristics and dynamic performance metrics are 
-decoupled and independently verifiable. This separation is 
-deliberate: static analysis operates on source code as 
-text, requiring no execution environment, while dynamic 
-execution requires a controlled subprocess environment with 
-resource limits. By keeping these two analytical tracks 
-independent, VibeBench allows researchers to run static 
-analysis on any Python file regardless of whether it is 
-safe to execute, and to add new heuristics to either track 
-without affecting the other. The core logic is divided 
-into three primary sub-packages, each with a single 
+VibeBench is designed as a modular, extensible pipeline
+written in Python. The framework follows a
+"Collector-Analyzer-Executor" architecture to ensure that
+static heuristics and dynamic performance metrics are
+decoupled and independently verifiable. This separation is
+deliberate: static analysis operates on source code as
+text, requiring no execution environment, while dynamic
+execution requires a controlled subprocess environment with
+resource limits. By keeping these two analytical tracks
+independent, VibeBench allows researchers to run static
+analysis on any Python file regardless of whether it is
+safe to execute, and to add new heuristics to either track
+without affecting the other. The core logic is divided
+into three primary sub-packages, each with a single
 well-defined responsibility.
 
 ## Static Quality Analyzer (`core/analyzer.py`)
@@ -162,7 +161,6 @@ execution.
 The `CodeExecutor` implements a secure lifecycle management system for safely
 evaluating unverified AI-generated code.
 
-
 - **Resource Limiting:** Leverages the Unix `resource` module to enforce hard
   limits on CPU time (`RLIMIT_CPU`) and maximum memory address space (`RLIMIT_AS`),
   preventing infinite loops or memory exhaustion from destabilizing the host system.
@@ -178,40 +176,39 @@ The reporting layer aggregates JSON-formatted raw data into human-readable outpu
 - **Performance Plotting:** Utilizes `matplotlib` to visualize the correlation
   between structural complexity scores and execution success rates.
 
+## Research impact statement
 
-# Research impact statement
-
-VibeBench enables a category of empirical software engineering research 
-that existing benchmarks cannot support: the systematic audit of 
-LLM-generated code as a software artifact rather than a mathematical 
-solution. By integrating static quality heuristics with sandboxed dynamic 
-execution, VibeBench allows researchers to answer questions that 
+VibeBench enables a category of empirical software engineering research
+that existing benchmarks cannot support: the systematic audit of
+LLM-generated code as a software artifact rather than a mathematical
+solution. By integrating static quality heuristics with sandboxed dynamic
+execution, VibeBench allows researchers to answer questions that
 pass/fail unit testing cannot address.
 
-In our initial evaluation across six models and five tasks, VibeBench 
-revealed several findings with direct implications for AI-assisted 
-software development. First, all evaluated models exhibited a significant 
-documentation gap: Claude produced 0% docstring coverage across all tasks 
-despite an 80% functional success rate, demonstrating that functional 
-correctness and code maintainability are independent dimensions that must 
-be measured separately. Second, human-authored baseline solutions achieved 
-lower average cyclomatic complexity (3.60) than every evaluated AI model, 
-confirming a systematic over-engineering tendency in LLM outputs that has 
-practical consequences for long-term code maintenance costs. Third, 
-VibeBench's heuristic detection identified a mutable default argument 
-anti-pattern in DeepSeek's TASK-005 output — a runtime-risk pattern that 
-caused an actual execution failure and that no existing benchmark would 
+In our initial evaluation across six models and five tasks, VibeBench
+revealed several findings with direct implications for AI-assisted
+software development. First, all evaluated models exhibited a significant
+documentation gap: Claude produced 0% docstring coverage across all tasks
+despite an 80% functional success rate, demonstrating that functional
+correctness and code maintainability are independent dimensions that must
+be measured separately. Second, human-authored baseline solutions achieved
+lower average cyclomatic complexity (3.60) than every evaluated AI model,
+confirming a systematic over-engineering tendency in LLM outputs that has
+practical consequences for long-term code maintenance costs. Third,
+VibeBench's heuristic detection identified a mutable default argument
+anti-pattern in DeepSeek's TASK-005 output — a runtime-risk pattern that
+caused an actual execution failure and that no existing benchmark would
 surface.
 
-These findings demonstrate that VibeBench fills a genuine measurement gap 
-in the LLM evaluation landscape. Researchers studying model evolution, 
-comparing code generation approaches, or building AI-audit pipelines for 
-production deployment can use VibeBench to quantify dimensions of code 
-quality that are invisible to correctness-only benchmarks. The framework 
-is designed to be extensible, allowing the research community to add new 
+These findings demonstrate that VibeBench fills a genuine measurement gap
+in the LLM evaluation landscape. Researchers studying model evolution,
+comparing code generation approaches, or building AI-audit pipelines for
+production deployment can use VibeBench to quantify dimensions of code
+quality that are invisible to correctness-only benchmarks. The framework
+is designed to be extensible, allowing the research community to add new
 heuristics, models, and task categories as the field evolves.
 
-# Mathematics
+## Mathematics
 
 VibeBench quantifies software quality through two complementary metric families:
 static complexity measures derived from source structure, and dynamic operational
@@ -265,49 +262,48 @@ Cyclomatic Complexity respectively, and $w_1, w_2, w_3$ are configurable
 weights summing to 1. Default weights are set empirically at
 $w_1 = 0.4$, $w_2 = 0.4$, $w_3 = 0.2$.
 
+## Limitations
 
-# Limitations
-
-VibeBench is subject to several limitations that 
-constrain the generalisability of its current findings 
+VibeBench is subject to several limitations that
+constrain the generalisability of its current findings
 and should be considered when interpreting results.
 
-First, the benchmark dataset in its current form covers 
-five tasks across three difficulty levels and six models. 
-While sufficient to demonstrate proof-of-concept findings, 
-this scale is modest compared to established benchmarks 
-such as HumanEval (164 tasks) or MBPP (374 tasks). 
-Conclusions about systematic LLM behaviour should 
-therefore be treated as preliminary until validated 
+First, the benchmark dataset in its current form covers
+five tasks across three difficulty levels and six models.
+While sufficient to demonstrate proof-of-concept findings,
+this scale is modest compared to established benchmarks
+such as HumanEval (164 tasks) or MBPP (374 tasks).
+Conclusions about systematic LLM behaviour should
+therefore be treated as preliminary until validated
 across a larger task set.
 
-Second, VibeBench currently supports only Python. The 
-"documentation crisis" and over-engineering patterns 
-observed in this study may differ substantially in 
-statically-typed languages such as Java or TypeScript, 
-where type annotations provide an alternative form of 
-documentation and compilers enforce structural 
+Second, VibeBench currently supports only Python. The
+"documentation crisis" and over-engineering patterns
+observed in this study may differ substantially in
+statically-typed languages such as Java or TypeScript,
+where type annotations provide an alternative form of
+documentation and compilers enforce structural
 constraints that Python does not.
 
-Third, the sandboxed execution environment uses 
-Unix-based resource limits (RLIMIT_CPU and RLIMIT_AS) 
-and is therefore not directly portable to Windows 
-without modification. The static analysis components 
-function cross-platform, but dynamic execution results 
+Third, the sandboxed execution environment uses
+Unix-based resource limits (RLIMIT_CPU and RLIMIT_AS)
+and is therefore not directly portable to Windows
+without modification. The static analysis components
+function cross-platform, but dynamic execution results
 may vary across operating systems.
 
-Fourth, the Human Baseline used in this study consists 
-of solutions authored by a single developer. A more 
-robust baseline would aggregate solutions from multiple 
-experienced developers to account for individual 
+Fourth, the Human Baseline used in this study consists
+of solutions authored by a single developer. A more
+robust baseline would aggregate solutions from multiple
+experienced developers to account for individual
 variation in coding style and complexity.
 
-These limitations represent concrete directions for 
-future work. Expanding the task set, adding 
-multi-language support, and recruiting multiple baseline 
+These limitations represent concrete directions for
+future work. Expanding the task set, adding
+multi-language support, and recruiting multiple baseline
 authors are planned for subsequent releases of VibeBench.
 
-# Figures
+## Figures
 
 ![The VibeBench System Architecture, illustrating the modular flow from LLM code ingestion to AST-based static analysis and sandboxed execution.\label{fig:architecture}](figures/architecture.png)
 
@@ -317,7 +313,7 @@ performance metrics.
 
 ![A sample of the VibeBench Leaderboard output, demonstrating how model performance is ranked across multiple trials.\label{fig:leaderboard}](figures/leaderboard_sample.png){ width=80% }
 
-# AI usage disclosure
+## AI usage disclosure
 
 In accordance with JOSS policies, the author discloses that generative AI tools
 (specifically Google Gemini and ChatGPT) were utilized during the development of
@@ -335,7 +331,7 @@ All scientific claims, experimental results, and data interpretations presented
 in this paper are the original work of the author and have been manually verified
 for accuracy.
 
-# Acknowledgements 
+## Acknowledgements
 
 The author thanks the faculty and administration of Saint Joseph Higher Secondary
 School, Dhaka, for fostering an environment that supports independent student
@@ -346,4 +342,4 @@ Committee and members of the Josephite Scintilla Science Club (JSSC) for their
 practical feedback on the framework's utility and their continued encouragement
 of student-led work in software engineering and AI research.
 
-# References
+## References
