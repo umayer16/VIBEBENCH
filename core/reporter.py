@@ -2,7 +2,7 @@ import json
 import os
 import glob
 from datetime import datetime
-from scipy import stats
+from scipy import stats as stat
 
 
 class VibeReporter:
@@ -25,7 +25,7 @@ class VibeReporter:
             f"**Report Date:** {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
         )
 
-        # 1. Aggregate stats per model
+        # 1. Aggregate stat per model
         models = {}
         for entry in self.data:
             m = entry.get('model', 'Unknown')
@@ -71,22 +71,22 @@ class VibeReporter:
         )
 
         rank = 1
-        for m, stats in sorted_models:
+        for m, stat in sorted_models:
             avg_c = (
-                round(sum(stats["comp"]) / len(stats["comp"]), 2)
-                if stats["comp"] else 0
+                round(sum(stat["comp"]) / len(stat["comp"]), 2)
+                if stat["comp"] else 0
             )
             avg_t = (
-                round(sum(stats["time"]) / len(stats["time"]), 4)
-                if stats["time"] else 0
+                round(sum(stat["time"]) / len(stat["time"]), 4)
+                if stat["time"] else 0
             )
             avg_d = (
-                round(sum(stats["docs"]) / len(stats["docs"]), 1)
-                if stats["docs"] else 0
+                round(sum(stat["docs"]) / len(stat["docs"]), 1)
+                if stat["docs"] else 0
             )
             success_rate = (
-                f"{stats['success']}/{stats['total']}"
-                if stats["total"] > 0 else "0/0"
+                f"{stat['success']}/{stat['total']}"
+                if stat["total"] > 0 else "0/0"
             )
 
             rank_str = "—" if m == "human_samples" else str(rank)
@@ -95,7 +95,7 @@ class VibeReporter:
 
             md_content += (
                 f"| {rank_str} | {m.upper()} | {avg_c} | {avg_t}s | "
-                f"{avg_d}% | {stats['bugs']} | {success_rate} |\n"
+                f"{avg_d}% | {stat['bugs']} | {success_rate} |\n"
             )
 
         # 3. Detailed File Analysis Table
@@ -177,7 +177,7 @@ class VibeReporter:
                         'note': 'Insufficient data'
                     }
                     continue
-                u_stat, p_val = stats.mannwhitneyu(
+                u_stat, p_val = stat.mannwhitneyu(
                     data_a, data_b, alternative='two-sided'
                 )
                 results[model_a][model_b] = {
@@ -186,7 +186,7 @@ class VibeReporter:
                     'significant': bool(p_val < 0.05)
                 }
         return results
-    
+
     def generate_significance_report(
         self,
         output_file="VibeBench_Significance_Report.md"
