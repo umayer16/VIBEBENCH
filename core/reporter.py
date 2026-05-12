@@ -2,7 +2,7 @@ import json
 import os
 import glob
 from datetime import datetime
-from scipy import stats as stat
+from scipy import stats
 
 
 class VibeReporter:
@@ -177,7 +177,7 @@ class VibeReporter:
                         'note': 'Insufficient data'
                     }
                     continue
-                u_stat, p_val = stat.mannwhitneyu(
+                u_stat, p_val = stats.mannwhitneyu(
                     data_a, data_b, alternative='two-sided'
                 )
                 results[model_a][model_b] = {

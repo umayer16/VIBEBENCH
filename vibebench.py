@@ -57,13 +57,13 @@ class VibeBench:
         Prints per-file metric details to stdout in verbose mode.
 
         Args:
-            record (dict): A single 
+            record(dict): A single 
             benchmark result record.
         """
         exec_time = record["execution_time_sec"]
         exec_time_str = (
             f"{exec_time:.3f}s" if isinstance(exec_time, (int, float)) else "N/A"
-)
+        )
 
         doc_cov = record["docstring_coverage"]
         doc_cov_str = f"{doc_cov:.1f}%" if isinstance(doc_cov, (int, float)) else "N/A"
@@ -338,12 +338,13 @@ def main():
             output_path = os.path.join(
                 args.output_dir, "VibeBench_Leaderboard.md"
             )
-            reporter.generate_markdown(output_file=output_path)            
+            reporter.generate_markdown(output_file=output_path)
         if args.significance:
             output_path = os.path.join(
                 args.output_dir, "VibeBench_Significance_Report.md"
             )
             reporter.generate_significance_report(output_file=output_path)
+
 
 if __name__ == "__main__":
     main()
