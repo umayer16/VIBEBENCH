@@ -241,8 +241,6 @@ class VibeReporter:
         print(f"✅ Significance report generated: {output_file}")
 
 
-
-
 if __name__ == "__main__":
     json_files = glob.glob("vibebench_multimodel_*.json")
 

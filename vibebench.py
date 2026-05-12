@@ -57,7 +57,7 @@ class VibeBench:
         Prints per-file metric details to stdout in verbose mode.
 
         Args:
-            record(dict): A single 
+            record(dict): A single
             benchmark result record.
         """
         exec_time = record["execution_time_sec"]
