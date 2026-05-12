@@ -233,6 +233,36 @@ def main():
         help="Path to save JSON results (optional, prints to stdout if omitted)."
     )
 
+    # --- report command ---
+    report_parser = subparsers.add_parser(
+        "report",
+        help="Generate reports from an existing benchmark JSON file."
+    )
+    report_parser.add_argument(
+        "--input",
+        required=True,
+        metavar="FILE",
+        help="Path to a benchmark JSON file."
+    )
+    report_parser.add_argument(
+        "--leaderboard",
+        action="store_true",
+        default=False,
+        help="Generate the markdown leaderboard."
+    )
+    report_parser.add_argument(
+        "--significance",
+        action="store_true",
+        default=False,
+        help="Generate pairwise statistical significance report."
+    )
+    report_parser.add_argument(
+        "--output-dir",
+        metavar="DIR",
+        default=".",
+        help="Directory to write report files (default: current directory)."
+    )
+
     # --- benchmark command ---
     benchmark_parser = subparsers.add_parser(
         "benchmark",
@@ -297,6 +327,15 @@ def main():
         datasets_dir = os.path.dirname(args.tasks)
         bench = VibeBench(root_dir=datasets_dir, verbose=args.verbose)
         bench.run_benchmark(export_csv=args.export_csv)
+    elif args.command == "report":
+        reporter = VibeReporter(args.input)
+        if args.leaderboard:
+            output_path = os.path.join(args.output_dir, "VibeBench_Leaderboard.md")
+            reporter.generate_markdown(output_file=output_path)
+            
+        if args.significance:
+            output_path = os.path.join(args.output_dir, "VibeBench_Significance_Report.md")
+            reporter.generate_significance_report(output_file=output_path)
 
 
 if __name__ == "__main__":

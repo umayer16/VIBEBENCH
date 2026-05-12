@@ -1,6 +1,7 @@
 # --- Core Dependencies ---
 radon==6.0.1
 mccabe==0.7.0
+scipy>=1.11.0
 
 # --- Testing ---
 pytest==8.0.0

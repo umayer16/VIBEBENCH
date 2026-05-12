@@ -1,14 +1,21 @@
 
 # Summary
-# Statement of Need
-# State of the field
-# Software Design        ← capital D — this is wrong
-# Mathematics
-# Figures
-# AI usage disclosure
-# Acknowledgements
-# References
-```
+
+## Statement of Need
+
+## Software Design        ← capital D — this is wrong
+
+## Mathematics
+
+## Figures
+
+## AI usage disclosure
+
+## Acknowledgements
+
+## References
+
+```text
 
 
 | JOSS Required Heading | Your Current Heading | Match? |

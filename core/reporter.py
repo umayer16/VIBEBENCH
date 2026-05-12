@@ -2,6 +2,7 @@ import json
 import os
 import glob
 from datetime import datetime
+from scipy import stats
 
 
 class VibeReporter:
@@ -132,6 +133,114 @@ class VibeReporter:
             f.write(md_content)
 
         print(f"✅ Professional Leaderboard generated: {output_file}")
+
+    def compare_models_statistically(self, metric='execution_time_sec'):
+        """
+        Performs pairwise Mann-Whitney U tests between all model pairs
+        for a given metric and returns a significance report.
+
+        The Mann-Whitney U test is used because execution times and
+        complexity scores are not normally distributed.
+
+        Args:
+            metric (str): The metric to compare. Must be a numeric field
+            in the benchmark JSON records. Default: execution_time_sec.
+
+        Returns:
+            dict: Nested dict of {model_a: {model_b: result_dict}} where
+                result_dict contains 'u_statistic', 'p_value', and
+                'significant' (bool, p < 0.05).
+        """
+        # Group metric values by model
+        model_data = {}
+        for entry in self.data:
+            m = entry.get('model', 'Unknown')
+            val = entry.get(metric)
+            if isinstance(val, (int, float)):
+                if m not in model_data:
+                    model_data[m] = []
+                model_data[m].append(val)
+        models = sorted(model_data.keys())
+        results = {}
+        for i, model_a in enumerate(models):
+            results[model_a] = {}
+            for model_b in models[i + 1:]:
+                data_a = model_data[model_a]
+                data_b = model_data[model_b]
+
+                # Need at least 3 data points per group for meaningful test
+                if len(data_a) < 3 or len(data_b) < 3:
+                    results[model_a][model_b] = {
+                        'u_statistic': None,
+                        'p_value': None,
+                        'significant': None,
+                        'note': 'Insufficient data'
+                    }
+                    continue
+                u_stat, p_val = stats.mannwhitneyu(
+                    data_a, data_b, alternative='two-sided'
+                )
+                results[model_a][model_b] = {
+                    'u_statistic': round(float(u_stat), 4),
+                    'p_value': round(float(p_val), 4),
+                    'significant': bool(p_val < 0.05)
+                }
+        return results
+    
+    def generate_significance_report(
+        self,
+        output_file="VibeBench_Significance_Report.md"
+    ):
+        """
+        Generates a Markdown report of pairwise statistical significance
+        tests between all models for execution time and complexity.
+
+        Args:
+            output_file (str): Path to write the Markdown report.
+        """
+        md = "# VibeBench Statistical Significance Report\n\n"
+        md += (
+            f"**Report Date:** {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
+        )
+        md += (
+            "Statistical comparisons use two-sided Mann-Whitney U tests. "
+            "Differences are considered significant at p < 0.05.\n\n"
+        )
+
+        for metric, label in [
+            ('execution_time_sec', 'Execution Time'),
+            ('complexity', 'Cyclomatic Complexity')
+        ]:
+            md += f"## {label} Comparisons\n\n"
+            md += "| Model A | Model B | U Statistic | p-value | Significant |\n"
+            md += "| :--- | :--- | :---: | :---: | :---: |\n"
+
+            results = self.compare_models_statistically(metric)
+
+            any_results = False
+            for model_a, comparisons in results.items():
+                for model_b, res in comparisons.items():
+                    any_results = True
+                    if res['p_value'] is None:
+                        md += (
+                            f"| {model_a.upper()} | {model_b.upper()} | "
+                            f"— | — | Insufficient data |\n"
+                        )
+                    else:
+                        sig = "✅ Yes" if res['significant'] else "❌ No"
+                        md += (
+                            f"| {model_a.upper()} | {model_b.upper()} | "
+                            f"{res['u_statistic']} | {res['p_value']} | "
+                            f"{sig} |\n"
+                        )
+            if not any_results:
+                md += "| No comparable model pairs found | | | | |\n"
+            md += "\n"
+        with open(output_file, 'w', encoding='utf-8') as f:
+            f.write(md)
+        print(f"✅ Significance report generated: {output_file}")
+
+
 
 
 if __name__ == "__main__":
