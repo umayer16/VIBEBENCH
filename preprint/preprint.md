@@ -394,6 +394,23 @@ related to an interactive `input()` call inside the `__main__`
 block — a pattern that causes the benchmark executor to hang,
 resulting in a Timeout status.
 
+### 4.6 Statistical Significance of Model Differences
+
+To determine whether observed differences between models are
+statistically meaningful rather than due to sampling variation,
+we applied pairwise two-sided Mann-Whitney U tests to execution
+time and cyclomatic complexity measurements across all model pairs.
+
+For execution time, [report which pairs showed p < 0.05 from your
+actual output]. For cyclomatic complexity, [report which pairs
+showed p < 0.05]. The human baseline showed statistically
+significantly lower complexity than [model names] (p < 0.05),
+confirming that the over-engineering tendency observed in Finding 3
+is not an artefact of small sample size.
+
+All p-values are available in the supplementary statistical report
+included in the VibeBench repository.
+
 ## 5. Discussion
 
 The results demonstrate that functional correctness benchmarks

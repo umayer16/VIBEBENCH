@@ -147,3 +147,63 @@ class TestGenerateMarkdown:
         # Should not raise even though grok entry has vibebench_score=None
         reporter.generate_markdown(output_file=output_path)
         assert os.path.exists(output_path)
+
+class TestStatisticalTesting:
+    def test_compare_models_returns_dict(self, reporter):
+        results = reporter.compare_models_statistically(
+            metric='execution_time_sec'
+        )
+        assert isinstance(results, dict)
+    
+    def test_compare_models_has_model_pairs(self, reporter):
+        results = reporter.compare_models_statistically(
+            metric='execution_time_sec'
+        )
+        # Should have at least one model pair
+        total_pairs = sum(len(v) for v in results.values())
+        assert total_pairs > 0
+    
+    def test_significance_result_has_required_keys(self, reporter):
+        results = reporter.compare_models_statistically(
+            metric='execution_time_sec'
+        )
+        for model_a, comparisons in results.items():
+            for model_b, res in comparisons.items():
+                if res.get('p_value') is not None:
+                    assert 'u_statistic' in res
+                    assert 'p_value' in res
+                    assert 'significant' in res
+                    assert isinstance(res['significant'], bool)
+    def test_p_value_between_0_and_1(self, reporter):
+        results = reporter.compare_models_statistically(
+            metric='complexity'
+        )
+        for model_a, comparisons in results.items():
+            for model_b, res in comparisons.items():
+                if res.get('p_value') is not None:
+                    assert 0.0 <= res['p_value'] <= 1.0
+    def test_generates_significance_report_file(
+        self, reporter, tmp_path
+    ):
+        output_path = str(
+            tmp_path / "significance_report.md"
+        )
+        reporter.generate_significance_report(
+            output_file=output_path
+        )
+        assert os.path.exists(output_path)
+    
+    def test_significance_report_contains_headers(
+        self, reporter, tmp_path
+    ):
+        output_path = str(
+            tmp_path / "significance_report.md"
+        )
+        reporter.generate_significance_report(
+            output_file=output_path
+        )
+        with open(output_path, 'r') as f:
+            content = f.read()
+        assert "Execution Time" in content
+        assert "Cyclomatic Complexity" in content
+        assert "p-value" in content

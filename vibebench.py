@@ -25,7 +25,8 @@ class VibeBench:
         Args:
             root_dir (str): Path to the directory containing model subfolders
                             (e.g., 'datasets/').
-            verbose (bool): If True, print per-file metric details during the run.
+            verbose (bool): If True,
+            print per-file metric details during the run.
         """
         self.root_dir = root_dir
         self.verbose = verbose
@@ -45,7 +46,9 @@ class VibeBench:
         """
         try:
             blocks = cc_visit(code)
-            return round(sum(b.complexity for b in blocks) / len(blocks), 2) if blocks else 0
+            return round(
+                sum(b.complexity for b in blocks) / len(blocks), 2
+            ) if blocks else 0
         except Exception:
             return None
 
@@ -54,10 +57,13 @@ class VibeBench:
         Prints per-file metric details to stdout in verbose mode.
 
         Args:
-            record (dict): A single benchmark result record.
+            record(dict): A single
+            benchmark result record.
         """
         exec_time = record["execution_time_sec"]
-        exec_time_str = f"{exec_time:.3f}s" if isinstance(exec_time, (int, float)) else "N/A"
+        exec_time_str = (
+            f"{exec_time:.3f}s" if isinstance(exec_time, (int, float)) else "N/A"
+        )
 
         doc_cov = record["docstring_coverage"]
         doc_cov_str = f"{doc_cov:.1f}%" if isinstance(doc_cov, (int, float)) else "N/A"
@@ -233,6 +239,36 @@ def main():
         help="Path to save JSON results (optional, prints to stdout if omitted)."
     )
 
+    # --- report command ---
+    report_parser = subparsers.add_parser(
+        "report",
+        help="Generate reports from an existing benchmark JSON file."
+    )
+    report_parser.add_argument(
+        "--input",
+        required=True,
+        metavar="FILE",
+        help="Path to a benchmark JSON file."
+    )
+    report_parser.add_argument(
+        "--leaderboard",
+        action="store_true",
+        default=False,
+        help="Generate the markdown leaderboard."
+    )
+    report_parser.add_argument(
+        "--significance",
+        action="store_true",
+        default=False,
+        help="Generate pairwise statistical significance report."
+    )
+    report_parser.add_argument(
+        "--output-dir",
+        metavar="DIR",
+        default=".",
+        help="Directory to write report files (default: current directory)."
+    )
+
     # --- benchmark command ---
     benchmark_parser = subparsers.add_parser(
         "benchmark",
@@ -292,11 +328,22 @@ def main():
             print(f"Results saved to {args.output}")
         else:
             print(json.dumps(results, indent=2))
-
     elif args.command == "benchmark":
         datasets_dir = os.path.dirname(args.tasks)
         bench = VibeBench(root_dir=datasets_dir, verbose=args.verbose)
         bench.run_benchmark(export_csv=args.export_csv)
+    elif args.command == "report":
+        reporter = VibeReporter(args.input)
+        if args.leaderboard:
+            output_path = os.path.join(
+                args.output_dir, "VibeBench_Leaderboard.md"
+            )
+            reporter.generate_markdown(output_file=output_path)
+        if args.significance:
+            output_path = os.path.join(
+                args.output_dir, "VibeBench_Significance_Report.md"
+            )
+            reporter.generate_significance_report(output_file=output_path)
 
 
 if __name__ == "__main__":
