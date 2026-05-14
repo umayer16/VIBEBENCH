@@ -42,7 +42,7 @@ class VibeBench:
 
         Returns:
             float: The average complexity of all code blocks, rounded to two
-                   decimal places. Returns None on error.
+                decimal places. Returns None on error.
         """
         try:
             blocks = cc_visit(code)
@@ -246,7 +246,7 @@ def main():
     )
     report_parser.add_argument(
         "--input",
-        required=True,
+        required=False,
         metavar="FILE",
         help="Path to a benchmark JSON file."
     )
@@ -267,6 +267,16 @@ def main():
         metavar="DIR",
         default=".",
         help="Directory to write report files (default: current directory)."
+    )
+    report_parser.add_argument(
+        "--compare",
+        nargs=2,
+        metavar=("FILE_A", "FILE_B"),
+        default=None,
+        help=(
+            "Compare two benchmark JSON files and report regressions "
+            "and improvements. Usage: --compare run1.json run2.json"
+        )
     )
 
     # --- benchmark command ---
@@ -334,6 +344,13 @@ def main():
         bench.run_benchmark(export_csv=args.export_csv)
     elif args.command == "report":
         reporter = VibeReporter(args.input)
+        if args.compare:
+            file_a, file_b = args.compare
+            output_path = os.path.join(
+                args.output_dir, "VibeBench_Comparison.md"
+            )
+            VibeReporter.compare_runs(file_a, file_b, output_file=output_path)
+
         if args.leaderboard:
             output_path = os.path.join(
                 args.output_dir, "VibeBench_Leaderboard.md"
@@ -344,6 +361,18 @@ def main():
                 args.output_dir, "VibeBench_Significance_Report.md"
             )
             reporter.generate_significance_report(output_file=output_path)
+        if not args.leaderboard and not args.significance and not args.compare:
+            print(
+                "⚠️  No report type specified. "
+                "Use --leaderboard, --significance, or --compare FILE_A FILE_B."
+            )
+        if args.leaderboard or args.significance:
+            if not args.input:
+                print(
+                    "❌ --input is required when using "
+                    "--leaderboard or --significance."
+                )
+                return
 
 
 if __name__ == "__main__":

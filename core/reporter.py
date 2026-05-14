@@ -212,7 +212,9 @@ class VibeReporter:
             ('complexity', 'Cyclomatic Complexity')
         ]:
             md += f"## {label} Comparisons\n\n"
-            md += "| Model A | Model B | U Statistic | p-value | Significant |\n"
+            md += (
+                "| Model A | Model B | U Statistic | p-value | Significant |\n"
+            )
             md += "| :--- | :--- | :---: | :---: | :---: |\n"
 
             results = self.compare_models_statistically(metric)
@@ -239,6 +241,181 @@ class VibeReporter:
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(md)
         print(f"✅ Significance report generated: {output_file}")
+
+    @staticmethod
+    def compare_runs(json_file_a, json_file_b, output_file="VibeBench_Comparison.md"):
+        """
+        Compares two benchmark JSON files and produces a regression/
+        improvement report showing how model performance changed between runs.
+
+        Models present in only one run are flagged as added or dropped.
+        For models present in both runs, changes in success rate, average
+        complexity, and average execution time are reported.
+        Args:
+            json_file_a (str): Path to the earlier benchmark JSON file
+                (baseline run).
+            json_file_b (str): Path to the later benchmark JSON file
+                (comparison run).
+            output_file (str): Path to write the Markdown comparison report.
+        Returns:
+            dict: Summary of changes keyed by model name.
+        """
+        for path in (json_file_a, json_file_b):
+            if not os.path.exists(path):
+                raise FileNotFoundError(f"Benchmark file not found: {path}")
+        with open(json_file_a, 'r', encoding='utf-8') as f:
+            data_a = json.load(f)
+        with open(json_file_b, 'r', encoding='utf-8') as f:
+            data_b = json.load(f)
+
+        def aggregate(data):
+
+            """Aggregate benchmark records by model into summary stats."""
+            models = {}
+            for entry in data:
+                m = entry.get('model', 'Unknown')
+                if m not in models:
+                    models[m] = {
+                        'success': 0, 'total': 0,
+                        'comp': [], 'time': []
+                    }
+                models[m]['total'] += 1
+                if entry.get('status') == 'Success':
+                    models[m]['success'] += 1
+                comp = entry.get('complexity')
+                if isinstance(comp, (int, float)):
+                    models[m]['comp'].append(comp)
+                exec_t = entry.get('execution_time_sec')
+                if isinstance(exec_t, (int, float)):
+                    models[m]['time'].append(exec_t)
+            # Compute averages
+            for m in models:
+                models[m]['avg_comp'] = (
+                    round(sum(models[m]['comp']) / len(models[m]['comp']), 2)
+                    if models[m]['comp'] else None
+                )
+                models[m]['avg_time'] = (
+                    round(sum(models[m]['time']) / len(models[m]['time']), 4)
+                    if models[m]['time'] else None
+                )
+                models[m]['success_rate'] = (
+                    models[m]['success'] / models[m]['total']
+                    if models[m]['total'] > 0 else 0
+                )
+            return models
+        stats_a = aggregate(data_a)
+        stats_b = aggregate(data_b)
+        added = set(stats_b.keys()) - set(stats_a.keys())
+        dropped = set(stats_a.keys()) - set(stats_b.keys())
+        common = set(stats_a.keys()) & set(stats_b.keys())
+
+        # Build Markdown report
+        md = "# VibeBench Run Comparison Report\n\n"
+        md += f"**Run A:** `{os.path.basename(json_file_a)}`\n"
+        md += f"**Run B:** `{os.path.basename(json_file_b)}`\n"
+        md += f"**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
+
+        # Models added or dropped
+        if added:
+            md += "## ✅ Models Added in Run B\n\n"
+            for m in sorted(added):
+                md += f"- `{m.upper()}`\n"
+            md += "\n"
+        if dropped:
+            md += "## ❌ Models Dropped from Run A\n\n"
+            for m in sorted(dropped):
+                md += f"- `{m.upper()}`\n"
+            md += "\n"
+        # Side-by-side comparison for common models
+        md += "## 📊 Model Performance Changes\n\n"
+        md += (
+            "| Model | Success A | Success B | Δ Success | "
+            "Avg Complexity A | Avg Complexity B | Δ Complexity | "
+            "Avg Exec Time A | Avg Exec Time B | Δ Exec Time |\n"
+        )
+        md += (
+            "| :--- | :---: | :---: | :---: | "
+            ":---: | :---: | :---: | "
+            ":---: | :---: | :---: |\n"
+        )
+
+        changes = {}
+        for m in sorted(common):
+            a = stats_a[m]
+            b = stats_b[m]
+
+            sr_a = f"{a['success']}/{a['total']}"
+            sr_b = f"{b['success']}/{b['total']}"
+            delta_sr = b['success_rate'] - a['success_rate']
+            delta_sr_str = (
+                f"+{delta_sr:.0%}" if delta_sr > 0
+                else f"{delta_sr:.0%}" if delta_sr < 0
+                else "—"
+            )
+
+            comp_a = a['avg_comp'] if a['avg_comp'] is not None else "N/A"
+            comp_b = b['avg_comp'] if b['avg_comp'] is not None else "N/A"
+            if isinstance(comp_a, float) and isinstance(comp_b, float):
+                delta_comp = round(comp_b - comp_a, 2)
+                delta_comp_str = (
+                    f"+{delta_comp}" if delta_comp > 0
+                    else str(delta_comp) if delta_comp < 0
+                    else "—"
+                )
+            else:
+                delta_comp_str = "N/A"
+
+            time_a = f"{a['avg_time']}s" if a['avg_time'] is not None else "N/A"
+            time_b = f"{b['avg_time']}s" if b['avg_time'] is not None else "N/A"
+            if a['avg_time'] is not None and b['avg_time'] is not None:
+                delta_time = round(b['avg_time'] - a['avg_time'], 4)
+                delta_time_str = (
+                    f"+{delta_time}s" if delta_time > 0
+                    else f"{delta_time}s" if delta_time < 0
+                    else "—"
+                )
+            else:
+                delta_time_str = "N/A"
+
+            md += (
+                f"| {m.upper()} | {sr_a} | {sr_b} | {delta_sr_str} | "
+                f"{comp_a} | {comp_b} | {delta_comp_str} | "
+                f"{time_a} | {time_b} | {delta_time_str} |\n"
+            )
+
+            changes[m] = {
+                'delta_success_rate': delta_sr,
+                'delta_complexity': (
+                    round(comp_b - comp_a, 2)
+                    if isinstance(comp_a, float) and isinstance(comp_b, float)
+                    else None
+                ),
+                'delta_exec_time': (
+                    round(b['avg_time'] - a['avg_time'], 4)
+                    if a['avg_time'] and b['avg_time'] else None
+                )
+            }
+        # Summary
+        regressions = [
+            m for m, c in changes.items() if c['delta_success_rate'] < 0
+        ]
+        improvements = [
+            m for m, c in changes.items() if c['delta_success_rate'] > 0
+        ]
+
+        md += "\n## 📋 Summary\n\n"
+        if improvements:
+            md += f"**Improved:** {', '.join(m.upper() for m in improvements)}\n\n"
+        if regressions:
+            md += f"**Regressed:** {', '.join(m.upper() for m in regressions)}\n\n"
+        if not improvements and not regressions:
+            md += "No success rate changes detected between runs.\n\n"
+
+        with open(output_file, 'w', encoding='utf-8') as f:
+            f.write(md)
+
+        print(f"✅ Comparison report generated: {output_file}")
+        return changes
 
 
 if __name__ == "__main__":

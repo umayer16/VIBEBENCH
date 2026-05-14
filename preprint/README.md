@@ -38,3 +38,15 @@ in progress before arXiv submission.
 | 6. Limitations | ✅ Complete |
 | 7. Conclusion | ✅ Complete |
 | References | ✅ Complete |
+
+### Generate reports from existing benchmark data
+
+```bash
+# Regenerate the leaderboard without re-running the benchmark
+vibebench report --input vibebench_multimodel_YYYYMMDD_HHMM.json --leaderboard
+
+# Generate statistical significance report
+vibebench report --input vibebench_multimodel_YYYYMMDD_HHMM.json --significance
+
+# Compare two benchmark runs for regressions and improvements
+vibebench report --compare run1.json run2.json
