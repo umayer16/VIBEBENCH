@@ -10,6 +10,52 @@ from core.reporter import VibeReporter
 
 # --- Fixtures ---
 
+@pytest.fixture
+def sample_json_path(tmp_path):
+    """Creates a minimal benchmark JSON file for testing."""
+    data = [
+        {
+            "model": "chatgpt", "file": "TASK-001.py",
+            "complexity": 2.0, "docstring_coverage": 100.0,
+            "bad_practices_count": 0, "execution_time_sec": 0.05,
+            "status": "Success"
+        },
+        {
+            "model": "chatgpt", "file": "TASK-002.py",
+            "complexity": 4.0, "docstring_coverage": 50.0,
+            "bad_practices_count": 1, "execution_time_sec": 0.12,
+            "status": "Runtime Error"
+        },
+        {
+            "model": "claude", "file": "TASK-001.py",
+            "complexity": 3.0, "docstring_coverage": 0.0,
+            "bad_practices_count": 0, "execution_time_sec": 0.06,
+            "status": "Success"
+        },
+        {
+            "model": "claude", "file": "TASK-002.py",
+            "complexity": 5.0, "docstring_coverage": 0.0,
+            "bad_practices_count": 0, "execution_time_sec": 0.09,
+            "status": "Success"
+        },
+        {
+            "model": "human_samples", "file": "TASK-001.py",
+            "complexity": 1.0, "docstring_coverage": 100.0,
+            "bad_practices_count": 0, "execution_time_sec": 0.04,
+            "status": "Success"
+        },
+        {
+            "model": "human_samples", "file": "TASK-002.py",
+            "complexity": 2.0, "docstring_coverage": 0.0,
+            "bad_practices_count": 0, "execution_time_sec": 0.05,
+            "status": "Success"
+        },
+    ]
+    path = str(tmp_path / "sample_benchmark.json")
+    with open(path, 'w') as f:
+        json.dump(data, f)
+    return path
+
 SAMPLE_DATA = [
     {
         "model": "chatgpt",
@@ -207,3 +253,58 @@ class TestStatisticalTesting:
         assert "Execution Time" in content
         assert "Cyclomatic Complexity" in content
         assert "p-value" in content
+
+class TestCompareRuns:
+
+    def test_compare_runs_produces_file(self, tmp_path, sample_json_path):
+        """compare_runs should create the output markdown file."""
+        output = str(tmp_path / "comparison.md")
+        # Compare file against itself — valid edge case
+        VibeReporter.compare_runs(
+            sample_json_path, sample_json_path,
+            output_file=output
+        )
+        assert os.path.exists(output)
+
+    def test_compare_runs_returns_dict(self, tmp_path, sample_json_path):
+        """compare_runs should return a dict of model changes."""
+        output = str(tmp_path / "comparison.md")
+        result = VibeReporter.compare_runs(
+            sample_json_path, sample_json_path,
+            output_file=output
+        )
+        assert isinstance(result, dict)
+
+    def test_compare_runs_contains_model_section(
+        self, tmp_path, sample_json_path
+    ):
+        """Output file should contain the performance changes table."""
+        output = str(tmp_path / "comparison.md")
+        VibeReporter.compare_runs(
+            sample_json_path, sample_json_path,
+            output_file=output
+        )
+        with open(output) as f:
+            content = f.read()
+        assert "Model Performance Changes" in content
+
+    def test_compare_runs_missing_file_raises(self, tmp_path, sample_json_path):
+        """compare_runs should raise FileNotFoundError for missing files."""
+        import pytest
+        output = str(tmp_path / "comparison.md")
+        with pytest.raises(FileNotFoundError):
+            VibeReporter.compare_runs(
+                "nonexistent_file.json", sample_json_path,
+                output_file=output
+            )
+
+    def test_same_file_shows_no_changes(self, tmp_path, sample_json_path):
+        """Comparing a file against itself should show no success rate changes."""
+        output = str(tmp_path / "comparison.md")
+        changes = VibeReporter.compare_runs(
+            sample_json_path, sample_json_path,
+            output_file=output
+        )
+        for model, delta in changes.items():
+            assert delta['delta_success_rate'] == 0.0
+
