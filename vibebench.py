@@ -279,14 +279,6 @@ def main():
         )
     )
 
-    if args.leaderboard or args.significance:
-        if not args.input:
-            print(
-                "❌ --input is required when using "
-                "--leaderboard or --significance."
-                )
-            return
-
     # --- benchmark command ---
     benchmark_parser = subparsers.add_parser(
         "benchmark",
@@ -374,6 +366,13 @@ def main():
                 "⚠️  No report type specified. "
                 "Use --leaderboard, --significance, or --compare FILE_A FILE_B."
             )
+        if args.leaderboard or args.significance:
+            if not args.input:
+                print(
+                    "❌ --input is required when using "
+                    "--leaderboard or --significance."
+                    )
+                return
 
 
 if __name__ == "__main__":

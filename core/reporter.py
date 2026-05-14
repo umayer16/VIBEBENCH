@@ -214,7 +214,7 @@ class VibeReporter:
             md += f"## {label} Comparisons\n\n"
             md += (
                 "| Model A | Model B | U Statistic | p-value | Significant |\n"
-                )
+            )
             md += "| :--- | :--- | :---: | :---: | :---: |\n"
 
             results = self.compare_models_statistically(metric)
@@ -287,7 +287,7 @@ class VibeReporter:
                     models[m]['comp'].append(comp)
                 exec_t = entry.get('execution_time_sec')
                 if isinstance(exec_t, (int, float)):
-                        models[m]['time'].append(exec_t)
+                    models[m]['time'].append(exec_t)
             # Compute averages
             for m in models:
                 models[m]['avg_comp'] = (
@@ -305,8 +305,6 @@ class VibeReporter:
             return models
         stats_a = aggregate(data_a)
         stats_b = aggregate(data_b)
-
-        all_models = set(stats_a.keys()) | set(stats_b.keys())
         added = set(stats_b.keys()) - set(stats_a.keys())
         dropped = set(stats_a.keys()) - set(stats_b.keys())
         common = set(stats_a.keys()) & set(stats_b.keys())
@@ -365,8 +363,7 @@ class VibeReporter:
                     else "—"
                 )
             else:
-                delta_comp_str ={
-                    "N/A"}
+                delta_comp_str = "N/A"
 
             time_a = f"{a['avg_time']}s" if a['avg_time'] is not None else "N/A"
             time_b = f"{b['avg_time']}s" if b['avg_time'] is not None else "N/A"
