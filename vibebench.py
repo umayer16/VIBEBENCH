@@ -371,7 +371,7 @@ def main():
                 print(
                     "❌ --input is required when using "
                     "--leaderboard or --significance."
-                    )
+                )
                 return
 
 
