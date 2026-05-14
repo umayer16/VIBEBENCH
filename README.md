@@ -135,9 +135,12 @@ See [VibeBench_Leaderboard.md](VibeBench_Leaderboard.md) for full results.
 ```
 VIBEBENCH/
 ├── core/
-│   ├── analyzer.py      # Static analysis engine (AST-based)
-│   ├── executor.py      # Sandboxed dynamic execution
-│   └── reporter.py      # Leaderboard and visualization
+│   ├── analyzer.py          # Static analysis engine (AST-based)
+│   ├── executor.py          # Sandboxed dynamic execution
+│   ├── reporter.py          # Leaderboard and visualization
+│   ├── gemini_generator.py  # Gemini API code generator
+│   ├── groq_generator.py    # Groq API code generator
+│   └── openai_generator.py  # OpenAI API code generator
 ├── datasets/            # Benchmark task definitions
 ├── figures/             # Architecture and leaderboard figures
 ├── tests/               # pytest test suite
