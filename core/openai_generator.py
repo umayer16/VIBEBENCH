@@ -24,7 +24,7 @@ except ImportError:
 def generate_code_openai(prompt, model_name="gpt-4o"):
 
     if OpenAI is None:
-         raise ImportError("openai is not installed.")
+        raise ImportError("openai is not installed.")
 
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
@@ -158,10 +158,10 @@ def run_generator(tasks_file, model_name, output_dir="datasets"):
             failed += 1
 
     print(
-        f"\n✅ Generation complete: "
+        "\n✅ Generation complete: "
         f"{success} succeeded, {failed} failed."
     )
-    print(f"\nRun VibeBench to analyze results:")
+    print("\nRun VibeBench to analyze results:")
     print(f"  python vibebench.py benchmark --tasks {tasks_file}")
 
 
