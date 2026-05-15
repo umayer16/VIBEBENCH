@@ -32,7 +32,8 @@ class VibeReporter:
             if m not in models:
                 models[m] = {
                     "comp": [], "time": [], "docs": [],
-                    "bugs": 0, "success": 0, "total": 0
+                    "bugs": 0, "success": 0, "total": 0,
+                    "carbon": []
                 }
 
             comp = entry.get('complexity')
@@ -47,6 +48,10 @@ class VibeReporter:
             if isinstance(doc_cov, (int, float)):
                 models[m]["docs"].append(doc_cov)
 
+            carbon = entry.get('carbon_footprint_gCO2e')
+            if isinstance(carbon, (int, float)):
+                models[m]["carbon"].append(carbon)
+
             models[m]["bugs"] += entry.get('bad_practices_count', 0)
             models[m]["total"] += 1
             if entry.get('status') == 'Success':
@@ -56,10 +61,11 @@ class VibeReporter:
         md_content += "## 📈 Model Comparison Summary\n\n"
         md_content += (
             "| Rank | Model | Avg Complexity | Avg Exec Time | "
-            "Avg Doc Coverage | Bad Practices | Success Rate |\n"
+            "Avg Doc Coverage | Bad Practices | Success Rate | "
+            "Total CO₂e (µg) |\n"
         )
         md_content += (
-            "| :---: | :--- | :---: | :---: | :---: | :---: | :---: |\n"
+            "| :---: | :--- | :---: | :---: | :---: | :---: | :---: | :---: |\n"
         )
 
         sorted_models = sorted(
@@ -93,9 +99,15 @@ class VibeReporter:
             if m != "human_samples":
                 rank += 1
 
+            total_carbon_ug = (
+                round(sum(stat["carbon"]) * 1_000_000, 4)  # convert g to µg
+                if stat["carbon"] else "N/A"
+            )
+
             md_content += (
                 f"| {rank_str} | {m.upper()} | {avg_c} | {avg_t}s | "
-                f"{avg_d}% | {stat['bugs']} | {success_rate} |\n"
+                f"{avg_d}% | {stat['bugs']} | {success_rate} | "
+                f"{total_carbon_ug} |\n"
             )
 
         # 3. Detailed File Analysis Table

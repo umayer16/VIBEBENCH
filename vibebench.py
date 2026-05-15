@@ -151,6 +151,9 @@ class VibeBench:
                             baseline_execution_time=baseline_time
                         )
 
+                    # Extract carbon footprint from executor output
+                    carbon_footprint = exec_metrics.get("carbon_footprint_gCO2e")
+
                     record = {
                         "schema_version": SCHEMA_VERSION,
                         "model": folder_name,
@@ -160,6 +163,7 @@ class VibeBench:
                         "docstring_coverage": doc_coverage,
                         "bad_practices_count": len(analyzer.detect_bad_practices()),
                         "execution_time_sec": execution_time_sec,
+                        "carbon_footprint_gCO2e": carbon_footprint,
                         "vibebench_score": vibebench_score,
                         "status": exec_metrics.get("status"),
                         "timestamp": datetime.now().isoformat()
