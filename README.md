@@ -170,6 +170,34 @@ To reproduce the findings from our v1.2.0 release:
    ```bash
    python vibebench.py benchmark --tasks datasets/prompts.json --verbose
 
+## Output Format
+
+VibeBench produces a JSON results file with the following structure per file:
+
+```json
+{
+  "schema_version": "1.1",
+  "model": "chatgpt",
+  "category": "AI Synthesis",
+  "file": "TASK-001_chatgpt.py",
+  "complexity": 1.8,
+  "docstring_coverage": 100.0,
+  "bad_practices_count": 0,
+  "execution_time_sec": 0.060,
+  "carbon_footprint_gCO2e": 0.000000119,
+  "vibebench_score": 0.42,
+  "status": "Success",
+  "timestamp": "2026-05-08T19:30:00"
+}
+```
+
+> **Note on `carbon_footprint_gCO2e`:** This is an order-of-magnitude
+> estimate computed as `execution_time_sec × 15W × 475 gCO₂/kWh ÷
+> 3,600,000`. It assumes a 15W laptop CPU and the IEA 2023 global
+> average carbon intensity. Actual emissions depend on your hardware,
+> location, and electricity grid mix. Use for relative comparisons
+> between models, not as absolute environmental measurements.
+
 ## Documentation
 
 | Guide | Description |

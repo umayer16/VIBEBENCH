@@ -161,6 +161,26 @@ means it regressed. Use this when comparing benchmark results before
 and after adding new tasks, or when a model provider releases an
 updated version.
 
+## Carbon Footprint (`carbon_footprint_gCO2e`)
+
+An order-of-magnitude estimate of the CO₂ equivalent emitted
+during execution, in grams.
+
+Formula: `execution_time_sec × 15W × 475 gCO₂/kWh ÷ 3,600,000`
+
+Typical values are extremely small — around 1–2 micrograms (µg)
+per execution. The leaderboard shows totals in µg for readability.
+
+**Important:** This is an estimate for relative comparison between
+models, not an absolute measurement. Actual emissions depend on
+your hardware TDP, location, and electricity grid carbon intensity.
+A model that takes twice as long to execute produces approximately
+twice the carbon footprint, all else being equal.
+
+The human baseline typically has a lower total carbon footprint
+than AI models because human-authored solutions tend to have lower
+average execution time.
+
 ## Common Misinterpretations
 
 **"Higher docstring coverage means better code."**
