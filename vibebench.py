@@ -171,7 +171,7 @@ class VibeBench:
 
                     # Print per-file details if --verbose is set
                     if self.verbose:
-                            self._print_verbose(record)
+                        self._print_verbose(record)
 
                     self.results.append(record)
 
