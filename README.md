@@ -142,6 +142,10 @@ VIBEBENCH/
 │   ├── groq_generator.py    # Groq API code generator
 │   └── openai_generator.py  # OpenAI API code generator
 ├── datasets/            # Benchmark task definitions
+├── docs/
+│   ├── adding-a-model.md        # Tutorial: add a new generator
+│   ├── adding-a-task.md         # Tutorial: add a new task
+│   └── interpreting-results.md  # Guide: understand the metrics
 ├── figures/             # Architecture and leaderboard figures
 ├── tests/               # pytest test suite
 ├── vibebench.py         # Main entry point
@@ -166,6 +170,13 @@ To reproduce the findings from our v1.2.0 release:
    ```bash
    python vibebench.py benchmark --tasks datasets/prompts.json --verbose
 
+## Documentation
+
+| Guide | Description |
+| ------- | ------------- |
+| [Adding a Model](docs/adding-a-model.md) | Add a new LLM provider |
+| [Adding a Task](docs/adding-a-task.md) | Add a new benchmark task |
+| [Interpreting Results](docs/interpreting-results.md) | Read the metrics |
 
 ## Citation
 
