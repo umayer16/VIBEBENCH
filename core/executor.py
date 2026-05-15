@@ -11,8 +11,10 @@ except ImportError:
 
 class CodeExecutor:
     """
-    Handles the dynamic execution of Python scripts in a sandboxed-style environment
-    using Unix resource limits to ensure operational safety.
+    Handles the dynamic execution of Python
+    scripts in a sandboxed-style environment
+    using Unix resource limits to ensure
+    operational safety.
     """
 
     def __init__(self, timeout=10, memory_limit_mb=512):
@@ -26,7 +28,8 @@ class CodeExecutor:
         self.memory_limit = memory_limit_mb * 1024 * 1024
 
     def _limit_resources(self):
-        """Sets hard CPU and memory limits on the child process (Unix-only)."""
+        """Sets hard CPU and memory limits
+        on the child process (Unix-only)."""
         if resource:
             resource.setrlimit(resource.RLIMIT_AS, (self.memory_limit, self.memory_limit))
 
@@ -53,7 +56,7 @@ class CodeExecutor:
 
         if not os.path.exists(file_path):
             return {
-                "status": "Error", 
+                "status": "Error",
                 "message": f"File {file_path} not found",
                 "stderr": "File not found",
                 "carbon_footprint_gCO2e": None
@@ -74,7 +77,7 @@ class CodeExecutor:
             # Carbon footprint estimate
             # Formula: time(s) * power(W) * carbon_intensity(gCO2/kWh) / 3,600,000
             carbon_footprint = round(
-                (execution_time * TDP_WATTS * CARBON_INTENSITY) / 3600000, 
+                (execution_time * TDP_WATTS * CARBON_INTENSITY) / 3600000,
                 9
             )
 
@@ -84,7 +87,7 @@ class CodeExecutor:
                 "carbon_footprint_gCO2e": carbon_footprint,
                 "stdout_preview": (result.stdout or "")[:1000].strip(),
                 "stderr": (result.stderr or "").strip(),
-                "stdout": result.stdout # Kept for backward compatibility with your original file
+                "stdout": result.stdout     # Kept for backward compatibility with your original file
             }
 
         except subprocess.TimeoutExpired:

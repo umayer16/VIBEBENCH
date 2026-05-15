@@ -155,23 +155,23 @@ class VibeBench:
                     carbon_footprint = exec_metrics.get("carbon_footprint_gCO2e")
 
                     record = {
-                    "schema_version": SCHEMA_VERSION,
-                    "model": folder_name,
-                    "category": "Benchmark Reference" if is_baseline else "AI Synthesis",
-                    "file": filename,
-                    "complexity": self.get_complexity(code),
-                    "docstring_coverage": doc_coverage,
-                    "bad_practices_count": len(analyzer.detect_bad_practices()),
-                    "execution_time_sec": execution_time_sec,
-                    "carbon_footprint_gCO2e": carbon_footprint,
-                    "vibebench_score": vibebench_score,
-                    "status": exec_metrics.get("status"),
-                    "timestamp": datetime.now().isoformat()
+                        "schema_version": SCHEMA_VERSION,
+                        "model": folder_name,
+                        "category": "Benchmark Reference" if is_baseline else "AI Synthesis",
+                        "file": filename,
+                        "complexity": self.get_complexity(code),
+                        "docstring_coverage": doc_coverage,
+                        "bad_practices_count": len(analyzer.detect_bad_practices()),
+                        "execution_time_sec": execution_time_sec,
+                        "carbon_footprint_gCO2e": carbon_footprint,
+                        "vibebench_score": vibebench_score,
+                        "status": exec_metrics.get("status"),
+                        "timestamp": datetime.now().isoformat()
                     }
 
                     # Print per-file details if --verbose is set
                     if self.verbose:
-                        self._print_verbose(record)
+                            self._print_verbose(record)
 
                     self.results.append(record)
 
