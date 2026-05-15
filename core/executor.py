@@ -87,7 +87,7 @@ class CodeExecutor:
                 "carbon_footprint_gCO2e": carbon_footprint,
                 "stdout_preview": (result.stdout or "")[:1000].strip(),
                 "stderr": (result.stderr or "").strip(),
-                "stdout": result.stdout     
+                "stdout": result.stdout
             }
 
         except subprocess.TimeoutExpired:
