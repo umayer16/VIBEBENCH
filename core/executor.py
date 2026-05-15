@@ -28,7 +28,6 @@ class CodeExecutor:
     def _limit_resources(self):
         """Sets hard CPU and memory limits on the child process (Unix-only)."""
         if resource:
-            resource.setrlimit(resource.RLIMIT_CPU, (self.timeout, self.timeout))
             resource.setrlimit(resource.RLIMIT_AS, (self.memory_limit, self.memory_limit))
 
     def run(self, file_path):
