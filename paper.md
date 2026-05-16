@@ -80,6 +80,9 @@ VibeBench allows researchers and software auditors to:
   hardcoded credentials using AST-based heuristics.
 - **Benchmark Operational Parity:** Compare AI performance against a formalized
   human baseline in a resource-constrained sandbox.
+- **Estimate Environmental Cost:** Compute per-execution carbon
+  footprint estimates to support Green IT research comparing the
+  energy efficiency of AI-generated versus human-authored algorithms.
 
 By providing these capabilities in an open-source, modular format, VibeBench
 empowers researchers to conduct large-scale longitudinal studies on model
@@ -166,6 +169,15 @@ evaluating unverified AI-generated code.
   preventing infinite loops or memory exhaustion from destabilizing the host system.
 - **Isolation:** Each test run executes in a clean environment, capturing `stdout`,
   `stderr`, and exit codes to determine runtime stability.
+
+Beyond timing and correctness, the executor computes an
+order-of-magnitude carbon footprint estimate for each execution
+using the formula $\text{CO}_2\text{e}$ = t × P × I / 3,600,000, where t is
+execution time in seconds, P = 15W is a typical laptop CPU TDP,
+and I = 475 gCO₂/kWh is the IEA 2023 global average carbon
+intensity. This makes VibeBench among the first code evaluation
+frameworks to report the environmental cost of AI-generated code
+execution, supporting Green IT research applications.
 
 ## Reporting and Visualization (`core/reporter.py`)
 

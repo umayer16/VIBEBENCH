@@ -1,5 +1,6 @@
 import os
 import sys
+from unittest import result
 import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -56,6 +57,53 @@ class TestExecutorSuccess:
         result = executor.run(str(script))
         assert result["status"] == "Success"
         assert "VibeBench test output" in result.get("stdout_preview", "")
+    
+    def test_carbon_footprint_present_on_success(self, tmp_path):
+        """Successful runs should include a carbon_footprint_gCO2e field."""
+        script = tmp_path / "hello.py"
+        script.write_text("print('hello')\n")
+        executor = CodeExecutor(timeout=5)
+        result = executor.run(str(script))
+        assert 'carbon_footprint_gCO2e' in result
+        assert isinstance(result['carbon_footprint_gCO2e'], float)
+
+    def test_carbon_footprint_is_positive(self, tmp_path):
+        """Carbon footprint should always be a positive number."""
+        script = tmp_path / "hello.py"
+        script.write_text("print('hello')\n")
+        executor = CodeExecutor(timeout=5)
+        result = executor.run(str(script))
+        assert result['carbon_footprint_gCO2e'] > 0
+
+    def test_carbon_footprint_none_on_timeout(self, tmp_path):
+        """Timed-out runs should have carbon_footprint_gCO2e = None."""
+        script = tmp_path / "infinite.py"
+        script.write_text("while True: pass\n")
+        executor = CodeExecutor(timeout=1)
+        result = executor.run(str(script))
+        assert result['status'] == 'Timeout'
+        assert result['carbon_footprint_gCO2e'] is None
+
+    def test_carbon_footprint_scales_with_time(self, tmp_path):
+        """A faster script should produce a smaller carbon footprint."""
+        fast_script = tmp_path / "fast.py"
+        fast_script.write_text("x = 1 + 1\n")
+
+        slow_script = tmp_path / "slow.py"
+        slow_script.write_text(
+            "import time\ntime.sleep(0.1)\n"
+        )
+
+        executor = CodeExecutor(timeout=5)
+        fast_result = executor.run(str(fast_script))
+        slow_result = executor.run(str(slow_script))
+
+        if (fast_result['carbon_footprint_gCO2e'] is not None
+                and slow_result['carbon_footprint_gCO2e'] is not None):
+            assert (
+                fast_result['carbon_footprint_gCO2e']
+                < slow_result['carbon_footprint_gCO2e']
+            )
 
 
 # --- Runtime Error Tests ---
