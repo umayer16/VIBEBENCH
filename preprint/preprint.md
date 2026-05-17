@@ -305,6 +305,12 @@ Results may differ slightly from those reported here due to
 non-determinism in LLM outputs and differences in hardware
 execution environments.
 
+To support reproducibility analysis, VibeBench optionally executes
+each file N times via the `--runs N` flag, reporting mean,
+standard deviation, minimum, and maximum execution time across
+runs. This allows researchers to distinguish genuine performance
+differences from single-measurement noise.
+
 ## 4. Results
 
 ### 4.1 Overall Model Performance

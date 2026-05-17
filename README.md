@@ -163,6 +163,21 @@ pytest tests/
 
 ---
 
+### Run the full benchmark
+
+```bash
+# Single run (default)
+vibebench benchmark --tasks datasets/prompts.json --export-csv
+
+# Multiple runs for reproducibility (3 runs per file)
+vibebench benchmark --tasks datasets/prompts.json --runs 3 --export-csv --verbose
+```
+
+With `--runs 3`, each file is executed 3 times. The JSON output
+includes `execution_time_sec` (mean), `execution_time_std`
+(standard deviation), `execution_time_min`, and `execution_time_max`.
+The leaderboard shows mean ± std dev in the execution time column.
+
 ## Reproducing Benchmark Results
 To reproduce the findings from our v1.2.0 release:
 1. Ensure your API keys are set in a `.env` file (see `.env.example`).

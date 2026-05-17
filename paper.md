@@ -146,6 +146,12 @@ without affecting the other. The core logic is divided
 into three primary sub-packages, each with a single
 well-defined responsibility.
 
+To support reproducibility analysis, VibeBench optionally executes
+each file N times via the `--runs N` flag, reporting mean,
+standard deviation, minimum, and maximum execution time across
+runs. This allows researchers to distinguish genuine performance
+differences from single-measurement noise.
+
 ## Static Quality Analyzer (`core/analyzer.py`)
 
 The `CodeAnalyzer` class serves as the static analysis engine, utilizing Python's

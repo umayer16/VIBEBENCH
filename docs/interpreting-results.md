@@ -197,3 +197,21 @@ alongside execution time.
 Sometimes. Runtime Errors on TASK-010 across all AI models were
 caused by a missing `aiohttp` dependency, not by incorrect logic.
 Always inspect the actual file when investigating a failure.
+
+### Execution Time Fields (multi-run mode)
+
+When `--runs N` is used with N > 1, the following additional
+fields appear in the JSON output:
+
+| Field | Description |
+| ------- | ------------- |
+| `execution_time_sec` | Mean execution time across N runs |
+| `execution_time_std` | Standard deviation across N runs |
+| `execution_time_min` | Fastest run |
+| `execution_time_max` | Slowest run |
+| `runs` | Total runs attempted |
+| `successful_runs` | Runs that exited with code 0 |
+
+A high standard deviation relative to the mean indicates
+inconsistent execution — which may signal I/O operations,
+network calls, or OS scheduling interference.

@@ -114,10 +114,10 @@ class VibeReporter:
         md_content += "\n## 🔍 Detailed File Analysis\n\n"
         md_content += (
             "| Model | File | Complexity | Exec Time | "
-            "Doc Coverage | Bad Practices | Status |\n"
+            "Doc Coverage | Bad Practices | Runs | Status |\n"
         )
         md_content += (
-            "| :--- | :--- | :---: | :---: | :---: | :---: | :---: |\n"
+            "| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |\n"
         )
 
         for entry in self.data:
@@ -125,9 +125,16 @@ class VibeReporter:
             fname = entry.get('file', 'N/A')
             comp = entry.get('complexity', 'N/A')
             exec_t = entry.get('execution_time_sec')
-            exec_t_str = (
-                f"{exec_t:.4f}s" if isinstance(exec_t, (int, float)) else "N/A"
-            )
+            std = entry.get('execution_time_std')
+
+            if isinstance(exec_t, (int, float)):
+                if isinstance(std, float):
+                    exec_t_str = f"{exec_t:.4f}s ± {std:.4f}s"
+                else:
+                    exec_t_str = f"{exec_t:.4f}s"
+            else:
+                exec_t_str = "N/A"
+
             doc_cov = entry.get('docstring_coverage')
             doc_cov_str = (
                 f"{doc_cov:.1f}%"
@@ -135,10 +142,15 @@ class VibeReporter:
             )
             bad = entry.get('bad_practices_count', 0)
             status = entry.get('status', 'N/A')
+            runs = entry.get('runs', 1)
+            run_str = (
+                f"{entry.get('successful_runs', '?')}/{runs}"
+                if runs > 1 else "1/1"
+            )
 
             md_content += (
                 f"| {model} | {fname} | {comp} | {exec_t_str} | "
-                f"{doc_cov_str} | {bad} | {status} |\n"
+                f"{doc_cov_str} | {bad} | {run_str} | {status} |\n"
             )
 
         with open(output_file, 'w', encoding='utf-8') as f:

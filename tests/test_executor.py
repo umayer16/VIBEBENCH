@@ -140,3 +140,86 @@ class TestExecutorTimeout:
         script.write_text('while True:\n    pass\n')
         result = fast_executor.run(str(script))
         assert result["status"] == "Timeout"
+
+class TestRunMultiple:
+
+    def test_returns_correct_keys(self, tmp_path):
+        """run_multiple should return all expected keys."""
+        script = tmp_path / "hello.py"
+        script.write_text("print('hello')\n")
+        executor = CodeExecutor(timeout=5)
+        result = executor.run_multiple(str(script), runs=2)
+        expected_keys = {
+            'status', 'execution_time', 'execution_time_std',
+            'execution_time_min', 'execution_time_max',
+            'successful_runs', 'total_runs', 'carbon_footprint_gCO2e'
+        }
+        assert expected_keys.issubset(result.keys())
+
+    def test_successful_runs_count(self, tmp_path):
+        """successful_runs should equal runs for a healthy script."""
+        script = tmp_path / "hello.py"
+        script.write_text("print('hello')\n")
+        executor = CodeExecutor(timeout=5)
+        result = executor.run_multiple(str(script), runs=3)
+        assert result['successful_runs'] == 3
+        assert result['total_runs'] == 3
+
+    def test_status_success_all_pass(self, tmp_path):
+        """Status should be Success when all runs succeed."""
+        script = tmp_path / "hello.py"
+        script.write_text("print('hello')\n")
+        executor = CodeExecutor(timeout=5)
+        result = executor.run_multiple(str(script), runs=2)
+        assert result['status'] == 'Success'
+
+    def test_mean_time_is_float(self, tmp_path):
+        """Mean execution time should be a float."""
+        script = tmp_path / "hello.py"
+        script.write_text("print('hello')\n")
+        executor = CodeExecutor(timeout=5)
+        result = executor.run_multiple(str(script), runs=2)
+        assert isinstance(result['execution_time'], float)
+
+    def test_std_none_for_single_run(self, tmp_path):
+        """Std dev should be None when only one run is requested."""
+        script = tmp_path / "hello.py"
+        script.write_text("print('hello')\n")
+        executor = CodeExecutor(timeout=5)
+        result = executor.run_multiple(str(script), runs=1)
+        assert result['execution_time_std'] is None
+
+    def test_std_float_for_multiple_runs(self, tmp_path):
+        """Std dev should be a float when runs >= 2."""
+        script = tmp_path / "hello.py"
+        script.write_text("print('hello')\n")
+        executor = CodeExecutor(timeout=5)
+        result = executor.run_multiple(str(script), runs=3)
+        assert isinstance(result['execution_time_std'], float)
+
+    def test_min_lte_mean_lte_max(self, tmp_path):
+        """Min <= mean <= max must always hold."""
+        script = tmp_path / "hello.py"
+        script.write_text("print('hello')\n")
+        executor = CodeExecutor(timeout=5)
+        result = executor.run_multiple(str(script), runs=3)
+        assert result['execution_time_min'] <= result['execution_time']
+        assert result['execution_time'] <= result['execution_time_max']
+
+    def test_invalid_runs_raises(self, tmp_path):
+        """run_multiple should raise ValueError for runs < 1."""
+        script = tmp_path / "hello.py"
+        script.write_text("print('hello')\n")
+        executor = CodeExecutor(timeout=5)
+        with pytest.raises(ValueError):
+            executor.run_multiple(str(script), runs=0)
+
+    def test_single_run_backward_compatible(self, tmp_path):
+        """runs=1 should produce same structure as run()."""
+        script = tmp_path / "hello.py"
+        script.write_text("print('hello')\n")
+        executor = CodeExecutor(timeout=5)
+        single = executor.run(str(script))
+        multi = executor.run_multiple(str(script), runs=1)
+        assert single['status'] == multi['status']
+        assert isinstance(multi['execution_time'], float)
