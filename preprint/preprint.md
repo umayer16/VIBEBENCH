@@ -338,7 +338,8 @@ the original five tasks, achieving 1/5 (20%) and 2/5 (40%)
 respectively — consistent with their performance in the initial
 benchmark round.
 
-### Table 1: Overall Model Performance Summary
+**Table 1: Overall Model Performance Summary**
+*(Execution times are means across 3 runs per file)*
 
 | Model | Tasks Evaluated | Success Rate | Avg Complexity | Avg Doc Coverage | Bad Practices |
 | ------- | ---------------- | ------------- | ---------------- | ----------------- | --------------- |
