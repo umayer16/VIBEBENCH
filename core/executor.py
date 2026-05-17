@@ -177,4 +177,3 @@ class CodeExecutor:
             'total_runs': runs,
             'carbon_footprint_gCO2e': mean_carbon,
         }
-
