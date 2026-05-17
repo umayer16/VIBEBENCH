@@ -377,7 +377,7 @@ def main():
         datasets_dir = os.path.dirname(args.tasks)
         bench = VibeBench(root_dir=datasets_dir, verbose=args.verbose)
         bench.run_benchmark(export_csv=args.export_csv, runs=args.runs)
-    
+
     elif args.command == "report":
         # 1. Handle run comparison first (Since it doesn't need a single --input file)
         if args.compare:
@@ -395,10 +395,10 @@ def main():
                     "--leaderboard or --significance."
                 )
                 return
-            
+
             # Safely instantiate now that we are certain args.input is provided
             reporter = VibeReporter(args.input)
-            
+
             if args.leaderboard:
                 output_path = os.path.join(
                     args.output_dir, "VibeBench_Leaderboard.md"
@@ -409,7 +409,7 @@ def main():
                     args.output_dir, "VibeBench_Significance_Report.md"
                 )
                 reporter.generate_significance_report(output_file=output_path)
-                
+
         if not args.leaderboard and not args.significance and not args.compare:
             print(
                 "⚠️  No report type specified. "
