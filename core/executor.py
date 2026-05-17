@@ -72,7 +72,7 @@ class CodeExecutor:
                 text=True,
                 timeout=self.timeout,
                 # Resource limiting only works on Unix systems
-                preexec_fn = (
+                preexec_fn=(
                     self._limit_resources
                     if (os.name != "nt" and resource)
                     else None
@@ -177,5 +177,4 @@ class CodeExecutor:
             'total_runs': runs,
             'carbon_footprint_gCO2e': mean_carbon,
         }
-
 

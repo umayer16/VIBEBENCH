@@ -2,7 +2,6 @@ import os
 import json
 from datetime import datetime
 
-from numpy import record
 from core.executor import CodeExecutor
 from core.analyzer import CodeAnalyzer
 from core.reporter import VibeReporter
@@ -81,8 +80,9 @@ class VibeBench:
             print(f"  Runs            : {successful}/{runs} succeeded")
         print(f"  Status          : {record['status']}")
         print()
-        
+
     def run_benchmark(self, export_csv=False, runs=1):
+
         """
         Executes the multi-model analysis by iterating through the dataset directory.
 
@@ -91,6 +91,7 @@ class VibeBench:
 
         Args:
             export_csv (bool): If True, also export results as a CSV file.
+            runs (int): Number of times to execute each script.
         """
         print(f"🚀 Starting Multi-Model Analysis on: {self.root_dir}\n")
 
@@ -161,7 +162,7 @@ class VibeBench:
                         )
 
                     # Extract carbon footprint from executor output
-                    carbon_footprint = exec_metrics.get("carbon_footprint_gCO2e")
+                    # carbon_footprint = exec_metrics.get("carbon_footprint_gCO2e")
 
                     record = {
                         "schema_version": SCHEMA_VERSION,
@@ -336,7 +337,7 @@ def main():
         action="store_true",
         default=False,
         help="Print per-file metric details (complexity, docstring coverage, "
-            "bad practices, execution time, status) during the benchmark run."
+             "bad practices, execution time, status) during the benchmark run."
     )
 
     benchmark_parser.add_argument(
