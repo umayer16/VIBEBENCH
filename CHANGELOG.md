@@ -11,6 +11,91 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.0] — 2026-05-18
+
+### Added
+
+- **Statistical significance testing** — `compare_models_statistically()`
+  in `core/reporter.py` performs pairwise two-sided Mann-Whitney U tests
+  between all model pairs for execution time and complexity metrics.
+  `generate_significance_report()` produces a Markdown table of p-values.
+  Differences are considered significant at p < 0.05.
+
+- **`report` subcommand** — new CLI subcommand in `vibebench.py` for
+  generating reports from existing benchmark JSON files without re-running
+  the full benchmark. Flags: `--leaderboard`, `--significance`,
+  `--compare FILE_A FILE_B`.
+
+- **`--compare` flag** — `vibebench report --compare run1.json run2.json`
+  produces a regression/improvement report showing delta in success rate,
+  average complexity, and average execution time between two benchmark runs.
+  Models added or dropped between runs are highlighted.
+
+- **`core/openai_generator.py`** — OpenAI GPT-4o API support for benchmark
+  code generation, completing the three-provider generator suite (Gemini,
+  Groq, OpenAI). Follows identical five-function pattern to existing
+  generators. Optional dependency: `openai>=1.0.0`.
+
+- **`docs/` tutorial directory** — three tutorial files targeting external
+  researchers: `adding-a-model.md`, `adding-a-task.md`,
+  `interpreting-results.md`. Index at `docs/README.md`. Directly satisfies
+  the JOSS reviewer checklist requirement for documentation beyond the README.
+
+- **Carbon footprint estimation** — `carbon_footprint_gCO2e` field added to
+  every benchmark record. Formula: `execution_time × 15W × 475 gCO₂/kWh
+  ÷ 3,600,000`. Defaults assume a 15W laptop CPU and IEA 2023 global average
+  carbon intensity. Documented as an order-of-magnitude estimate for relative
+  comparison. Total CO₂e column added to leaderboard summary table.
+
+- **`--runs N` reproducibility flag** — `vibebench benchmark --runs 3`
+  executes each file N times and reports mean, standard deviation (Bessel-
+  corrected), minimum, and maximum execution time. `run_multiple()` method
+  added to `CodeExecutor`. Std dev displayed as `mean ± std` in verbose
+  output and detailed leaderboard table.
+
+- **`outreach/` directory** — Reddit post drafts, blog post draft, and
+  professor email template prepared for arXiv preprint promotion.
+
+- **arXiv preprint submitted** — "Beyond Correctness: A Holistic Quality
+  Audit of LLM-Generated Python Code Using VibeBench" submitted to arXiv
+  cs.SE on May 13, 2026. Awaiting moderation.
+
+- **10-task benchmark dataset** — model outputs collected for TASK-006
+  through TASK-010 from ChatGPT, Gemini, and Claude. Full benchmark now
+  covers 10 tasks across 7 systems (3 models fully evaluated on all 10
+  tasks, 4 models evaluated on original 5 tasks).
+
+### Fixed
+
+- **Leaderboard column mismatch** — summary table header had 5 columns
+  but rows had 6 values. Fixed in `core/reporter.py`.
+- **`report` subcommand handler missing** — `elif args.command == "report"`
+  block was absent from `vibebench.py`. Fixed.
+- **OpenAI generator mock patching** — `OpenAI` imported inside function
+  body prevented `unittest.mock.patch` from intercepting it. Moved to
+  module-level `try/except` import.
+- **`TASK-008_manual.py` Runtime Error** — human baseline created
+  `sample.json` in `__main__` block rather than using a self-contained
+  test file. Fixed to create and clean up a temporary file.
+
+### Changed
+
+- `core/reporter.py` leaderboard sorted by success rate descending
+  (previously sorted by model name alphabetically).
+- Detailed file analysis table now includes Runs and std dev columns
+  when `--runs N > 1` is used.
+- `--input` flag on `report` subcommand changed from required to optional
+  (not needed when using `--compare`).
+- `pyproject.toml` now includes optional `[llm]` dependency group:
+  `pip install vibebench[llm]` installs all three generator SDKs.
+
+### Dependencies
+
+- Added `scipy>=1.11.0` as a core dependency for statistical testing.
+- Added `openai>=1.0.0` to optional `[llm]` dependency group.
+
+---
+
 ## [1.3.0] — 2026-05-03
 
 ### Added
@@ -153,6 +238,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 [Unreleased]: https://github.com/umayer16/VIBEBENCH/compare/v1.3.0...HEAD
+[1.4.0]: https://github.com/umayer16/VIBEBENCH/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/umayer16/VIBEBENCH/releases/tag/v1.3.0
 [1.2.0]: https://github.com/umayer16/VIBEBENCH/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/umayer16/VIBEBENCH/compare/v1.0.0...v1.1.0
