@@ -377,8 +377,9 @@ def main():
         datasets_dir = os.path.dirname(args.tasks)
         bench = VibeBench(root_dir=datasets_dir, verbose=args.verbose)
         bench.run_benchmark(export_csv=args.export_csv, runs=args.runs)
+    
     elif args.command == "report":
-        reporter = VibeReporter(args.input)
+        # 1. Handle run comparison first (Since it doesn't need a single --input file)
         if args.compare:
             file_a, file_b = args.compare
             output_path = os.path.join(
@@ -386,21 +387,7 @@ def main():
             )
             VibeReporter.compare_runs(file_a, file_b, output_file=output_path)
 
-        if args.leaderboard:
-            output_path = os.path.join(
-                args.output_dir, "VibeBench_Leaderboard.md"
-            )
-            reporter.generate_markdown(output_file=output_path)
-        if args.significance:
-            output_path = os.path.join(
-                args.output_dir, "VibeBench_Significance_Report.md"
-            )
-            reporter.generate_significance_report(output_file=output_path)
-        if not args.leaderboard and not args.significance and not args.compare:
-            print(
-                "⚠️  No report type specified. "
-                "Use --leaderboard, --significance, or --compare FILE_A FILE_B."
-            )
+        # 2. Check and handle options that require a standard single-report analysis
         if args.leaderboard or args.significance:
             if not args.input:
                 print(
@@ -408,6 +395,26 @@ def main():
                     "--leaderboard or --significance."
                 )
                 return
+            
+            # Safely instantiate now that we are certain args.input is provided
+            reporter = VibeReporter(args.input)
+            
+            if args.leaderboard:
+                output_path = os.path.join(
+                    args.output_dir, "VibeBench_Leaderboard.md"
+                )
+                reporter.generate_markdown(output_file=output_path)
+            if args.significance:
+                output_path = os.path.join(
+                    args.output_dir, "VibeBench_Significance_Report.md"
+                )
+                reporter.generate_significance_report(output_file=output_path)
+                
+        if not args.leaderboard and not args.significance and not args.compare:
+            print(
+                "⚠️  No report type specified. "
+                "Use --leaderboard, --significance, or --compare FILE_A FILE_B."
+            )
 
 
 if __name__ == "__main__":

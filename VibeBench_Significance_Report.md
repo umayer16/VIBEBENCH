@@ -1,6 +1,6 @@
 # VibeBench Statistical Significance Report
 
-**Report Date:** 2026-05-12 20:55
+**Report Date:** 2026-05-17 13:30
 
 Statistical comparisons use two-sided Mann-Whitney U tests. Differences are considered significant at p < 0.05.
 
@@ -8,27 +8,27 @@ Statistical comparisons use two-sided Mann-Whitney U tests. Differences are cons
 
 | Model A | Model B | U Statistic | p-value | Significant |
 | :--- | :--- | :---: | :---: | :---: |
-| CHATGPT | CLAUDE | 55.0 | 0.7337 | ❌ No |
-| CHATGPT | DEEPSEEK | 20.0 | 0.5941 | ❌ No |
-| CHATGPT | GEMINI | 41.0 | 0.5205 | ❌ No |
-| CHATGPT | GROK | 21.0 | 0.6787 | ❌ No |
-| CHATGPT | HUMAN_SAMPLES | 57.0 | 0.6232 | ❌ No |
-| CHATGPT | LLAMA_3_3_70B_VERSATILE | 28.0 | 0.7679 | ❌ No |
-| CLAUDE | DEEPSEEK | 14.0 | 0.2065 | ❌ No |
-| CLAUDE | GEMINI | 28.0 | 0.1041 | ❌ No |
-| CLAUDE | GROK | 18.0 | 0.4396 | ❌ No |
-| CLAUDE | HUMAN_SAMPLES | 49.0 | 0.9698 | ❌ No |
-| CLAUDE | LLAMA_3_3_70B_VERSATILE | 24.0 | 0.953 | ❌ No |
+| CHATGPT | CLAUDE | 90.0 | 0.0028 | ✅ Yes |
+| CHATGPT | DEEPSEEK | 45.0 | 0.0127 | ✅ Yes |
+| CHATGPT | GEMINI | 90.0 | 0.0028 | ✅ Yes |
+| CHATGPT | GROK | 41.0 | 0.0553 | ❌ No |
+| CHATGPT | HUMAN_SAMPLES | 85.0 | 0.0091 | ✅ Yes |
+| CHATGPT | LLAMA_3_3_70B_VERSATILE | 45.0 | 0.0127 | ✅ Yes |
+| CLAUDE | DEEPSEEK | 13.0 | 0.1645 | ❌ No |
+| CLAUDE | GEMINI | 27.0 | 0.089 | ❌ No |
+| CLAUDE | GROK | 9.0 | 0.0553 | ❌ No |
+| CLAUDE | HUMAN_SAMPLES | 57.0 | 0.6232 | ❌ No |
+| CLAUDE | LLAMA_3_3_70B_VERSATILE | 19.0 | 0.5135 | ❌ No |
 | DEEPSEEK | GEMINI | 27.0 | 0.8591 | ❌ No |
-| DEEPSEEK | GROK | 15.0 | 0.6905 | ❌ No |
-| DEEPSEEK | HUMAN_SAMPLES | 33.0 | 0.371 | ❌ No |
-| DEEPSEEK | LLAMA_3_3_70B_VERSATILE | 18.0 | 0.3095 | ❌ No |
-| GEMINI | GROK | 25.0 | 1.0 | ❌ No |
-| GEMINI | HUMAN_SAMPLES | 66.0 | 0.2413 | ❌ No |
-| GEMINI | LLAMA_3_3_70B_VERSATILE | 36.0 | 0.2065 | ❌ No |
-| GROK | HUMAN_SAMPLES | 31.0 | 0.5135 | ❌ No |
-| GROK | LLAMA_3_3_70B_VERSATILE | 15.0 | 0.6905 | ❌ No |
-| HUMAN_SAMPLES | LLAMA_3_3_70B_VERSATILE | 23.0 | 0.8591 | ❌ No |
+| DEEPSEEK | GROK | 9.0 | 0.5476 | ❌ No |
+| DEEPSEEK | HUMAN_SAMPLES | 37.0 | 0.1645 | ❌ No |
+| DEEPSEEK | LLAMA_3_3_70B_VERSATILE | 15.0 | 0.6905 | ❌ No |
+| GEMINI | GROK | 19.0 | 0.5135 | ❌ No |
+| GEMINI | HUMAN_SAMPLES | 70.0 | 0.1405 | ❌ No |
+| GEMINI | LLAMA_3_3_70B_VERSATILE | 32.0 | 0.4396 | ❌ No |
+| GROK | HUMAN_SAMPLES | 37.0 | 0.1645 | ❌ No |
+| GROK | LLAMA_3_3_70B_VERSATILE | 20.0 | 0.1508 | ❌ No |
+| HUMAN_SAMPLES | LLAMA_3_3_70B_VERSATILE | 15.0 | 0.2544 | ❌ No |
 
 ## Cyclomatic Complexity Comparisons
 

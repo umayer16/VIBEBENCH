@@ -292,14 +292,27 @@ baseline to account for individual variation.
 
 All benchmark data, prompts, human baseline solutions, and
 LLM-generated outputs are publicly available at
-[https://github.com/umayer16/VIBEBENCH](https://github.com/umayer16/VIBEBENCH) under the MIT License.The full benchmark can be reproduced using:
+https://github.com/umayer16/VIBEBENCH under the MIT License.
+
+Results reported in this paper use three execution runs per file
+(`--runs 3`). We report mean execution time with standard deviation
+to distinguish genuine performance differences from single-
+measurement noise. The full reproducible benchmark dataset
+is available at `results/vibebench_v1.4_reproducible_benchmark.json`
+in the repository.
+
+The benchmark can be reproduced using:
 
 ```bash
 git clone https://github.com/umayer16/VIBEBENCH.git
 cd VIBEBENCH
 pip install .
-vibebench benchmark --tasks datasets/prompts.json --export-csv
+vibebench benchmark --tasks datasets/prompts.json --runs 3 --export-csv
 ```
+
+Results may differ slightly from those reported here due to
+non-determinism in execution timing across different hardware
+and operating system configurations.
 
 Results may differ slightly from those reported here due to
 non-determinism in LLM outputs and differences in hardware
