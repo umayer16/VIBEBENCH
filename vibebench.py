@@ -1,6 +1,7 @@
 import os
 import json
 from datetime import datetime
+
 from core.executor import CodeExecutor
 from core.analyzer import CodeAnalyzer
 from core.reporter import VibeReporter
@@ -53,32 +54,35 @@ class VibeBench:
             return None
 
     def _print_verbose(self, record):
-        """
-        Prints per-file metric details to stdout in verbose mode.
-
-        Args:
-            record(dict): A single
-            benchmark result record.
-        """
         exec_time = record["execution_time_sec"]
         exec_time_str = (
-            f"{exec_time:.3f}s" if isinstance(exec_time, (int, float)) else "N/A"
+            f"{exec_time:.4f}s"
+            if isinstance(exec_time, (int, float)) else "N/A"
         )
 
+        std = record.get("execution_time_std")
+        std_str = f" ± {std:.4f}s" if isinstance(std, float) else ""
+
         doc_cov = record["docstring_coverage"]
-        doc_cov_str = f"{doc_cov:.1f}%" if isinstance(doc_cov, (int, float)) else "N/A"
+        doc_cov_str = (
+            f"{doc_cov:.1f}%"
+            if isinstance(doc_cov, (int, float)) else "N/A"
+        )
 
-        complexity = record["complexity"]
-        complexity_str = str(complexity) if complexity is not None else "N/A"
+        runs = record.get("runs", 1)
+        successful = record.get("successful_runs", "N/A")
 
-        print(f"  Complexity      : {complexity_str}")
+        print(f"  Complexity      : {record['complexity']}")
         print(f"  Docstring Cover : {doc_cov_str}")
         print(f"  Bad Practices   : {record['bad_practices_count']}")
-        print(f"  Execution Time  : {exec_time_str}")
+        print(f"  Exec Time (mean): {exec_time_str}{std_str}")
+        if runs > 1:
+            print(f"  Runs            : {successful}/{runs} succeeded")
         print(f"  Status          : {record['status']}")
         print()
 
-    def run_benchmark(self, export_csv=False):
+    def run_benchmark(self, export_csv=False, runs=1):
+
         """
         Executes the multi-model analysis by iterating through the dataset directory.
 
@@ -87,6 +91,7 @@ class VibeBench:
 
         Args:
             export_csv (bool): If True, also export results as a CSV file.
+            runs (int): Number of times to execute each script.
         """
         print(f"🚀 Starting Multi-Model Analysis on: {self.root_dir}\n")
 
@@ -101,7 +106,8 @@ class VibeBench:
                     baseline_metrics = self.executor.run(fpath)
                     bt = baseline_metrics.get("execution_time")
                     if isinstance(bt, (int, float)):
-                        # Key by task ID: e.g. "TASK-001" from "TASK-001_manual.py"
+                        # Key by task ID: e.g. "TASK-001"
+                        # from "TASK-001_manual.py"
                         task_id = fname.split("_")[0].upper()
                         baseline_times[task_id] = bt
 
@@ -125,7 +131,11 @@ class VibeBench:
                         code = f.read()
 
                     # Dynamic Execution in sandboxed environment
-                    exec_metrics = self.executor.run(path)
+                    # Dynamic Execution — single run or multi-run
+                    if runs > 1:
+                        exec_metrics = self.executor.run_multiple(path, runs=runs)
+                    else:
+                        exec_metrics = self.executor.run(path)
 
                     # Static Analysis using the core Analyzer
                     analyzer = CodeAnalyzer(code)
@@ -152,18 +162,27 @@ class VibeBench:
                         )
 
                     # Extract carbon footprint from executor output
-                    carbon_footprint = exec_metrics.get("carbon_footprint_gCO2e")
+                    # carbon_footprint = exec_metrics.get("carbon_footprint_gCO2e")
 
                     record = {
                         "schema_version": SCHEMA_VERSION,
                         "model": folder_name,
-                        "category": "Benchmark Reference" if is_baseline else "AI Synthesis",
+                        "category": (
+                            "Benchmark Reference" if is_baseline else "AI Synthesis"
+                        ),
                         "file": filename,
                         "complexity": self.get_complexity(code),
                         "docstring_coverage": doc_coverage,
                         "bad_practices_count": len(analyzer.detect_bad_practices()),
                         "execution_time_sec": execution_time_sec,
-                        "carbon_footprint_gCO2e": carbon_footprint,
+                        "execution_time_std": exec_metrics.get("execution_time_std"),
+                        "execution_time_min": exec_metrics.get("execution_time_min"),
+                        "execution_time_max": exec_metrics.get("execution_time_max"),
+                        "runs": exec_metrics.get("total_runs", 1),
+                        "successful_runs": exec_metrics.get("successful_runs", None),
+                        "carbon_footprint_gCO2e": exec_metrics.get(
+                            "carbon_footprint_gCO2e"
+                        ),
                         "vibebench_score": vibebench_score,
                         "status": exec_metrics.get("status"),
                         "timestamp": datetime.now().isoformat()
@@ -321,6 +340,18 @@ def main():
              "bad practices, execution time, status) during the benchmark run."
     )
 
+    benchmark_parser.add_argument(
+        "--runs",
+        type=int,
+        default=1,
+        metavar="N",
+        help=(
+            "Number of times to execute each file for reproducibility "
+            "analysis. Reports mean and std dev of execution time. "
+            "Default: 1 (single run, original behaviour)."
+        )
+    )
+
     args = parser.parse_args()
 
     if args.command == "analyze":
@@ -345,7 +376,7 @@ def main():
     elif args.command == "benchmark":
         datasets_dir = os.path.dirname(args.tasks)
         bench = VibeBench(root_dir=datasets_dir, verbose=args.verbose)
-        bench.run_benchmark(export_csv=args.export_csv)
+        bench.run_benchmark(export_csv=args.export_csv, runs=args.runs)
     elif args.command == "report":
         reporter = VibeReporter(args.input)
         if args.compare:
