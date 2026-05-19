@@ -59,7 +59,8 @@ def generate_code_openai(prompt: str, model_name: str = "gpt-4o") -> str:
     )
 
     # Safely extract string content
-    raw_code: str = response.choices[0].message.content if response.choices[0].message.content is not None else ""
+    content = getattr(response.choices[0].message, "content", "")
+    raw_code: str = content if content is not None else ""
     code: str = raw_code.strip()
 
     # Strip markdown code fences if model includes them despite instructions

@@ -165,7 +165,7 @@ def main():
         default="gemini-1.5-flash",
         metavar="MODEL",
         help="Gemini model to use (default: gemini-1.5-flash). "
-            "Options: gemini-1.5-flash, gemini-1.5-pro, gemini-2.0-flash"
+             "Options: gemini-1.5-flash, gemini-1.5-pro, gemini-2.0-flash"
     )
     parser.add_argument(
         "--output-dir",
