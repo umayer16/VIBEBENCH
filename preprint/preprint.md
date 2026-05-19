@@ -292,7 +292,7 @@ baseline to account for individual variation.
 
 All benchmark data, prompts, human baseline solutions, and
 LLM-generated outputs are publicly available at
-https://github.com/umayer16/VIBEBENCH under the MIT License.
+[VibeBench GitHub Repository](https://github.com/umayer16/VIBEBENCH) under the MIT License.
 
 Results reported in this paper use three execution runs per file
 (`--runs 3`). We report mean execution time with standard deviation
