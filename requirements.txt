@@ -15,3 +15,7 @@ matplotlib==3.8.0
 google-genai>=0.3.0
 groq>=0.4.0
 openai>=1.0.0
+
+# --- Dev Tools ---
+flake8>=7.0.0
+mypy>=1.8.0

@@ -11,6 +11,7 @@ SCHEMA_VERSION = "1.1"
 
 
 class VibeBench:
+
     """
     The main orchestration framework for VibeBench.
 
@@ -120,8 +121,9 @@ class VibeBench:
 
             # Formalizing the Human Baseline label
             is_baseline = folder_name == "human_samples"
-            model_label = "HUMAN_BASELINE (Reference)" if is_baseline else folder_name.upper()
-
+            model_label = (
+                "HUMAN_BASELINE (Reference)" if is_baseline else folder_name.upper()
+            )
             for filename in files:
                 if filename.endswith(".py"):
                     path = os.path.join(root, filename)

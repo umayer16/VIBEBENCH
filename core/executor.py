@@ -1,43 +1,44 @@
-import subprocess
-import time
 import os
+import subprocess
 import sys
+import time
+from typing import Any, Optional
 
+# 1. Fix mypy module errors by using a conditional check with 'types' fallback
+# or letting mypy know 'resource' can be None via type annotation.
 try:
     import resource
 except ImportError:
-    resource = None
+    resource = None  # type: ignore[assignment]
 
 
 class CodeExecutor:
-    """
-    Handles the dynamic execution of Python
-    scripts in a sandboxed-style environment
-    using Unix resource limits to ensure
-    operational safety.
+    """Handles the dynamic execution of Python scripts in a sandboxed-style
+
+    environment using Unix resource limits to ensure operational safety.
     """
 
-    def __init__(self, timeout=10, memory_limit_mb=512):
-        """
-        Initializes the executor with specific safety constraints.
+    def __init__(self, timeout: int = 10, memory_limit_mb: int = 512) -> None:
+        """Initializes the executor with specific safety constraints.
+
         Args:
             timeout (int): Maximum CPU time allowed in seconds.
             memory_limit_mb (int): Maximum memory allowed in megabytes.
         """
-        self.timeout = timeout
-        self.memory_limit = memory_limit_mb * 1024 * 1024
+        self.timeout: int = timeout
+        self.memory_limit: int = memory_limit_mb * 1024 * 1024
 
-    def _limit_resources(self):
-        """Sets hard CPU and memory limits
-        on the child process (Unix-only)."""
-        if resource:
-            resource.setrlimit(
-                resource.RLIMIT_AS, (self.memory_limit, self.memory_limit)
-            )
+    def _limit_resources(self) -> None:
+        """Sets hard CPU and memory limits on the child process (Unix-only)."""
+        if resource is not None:
+            # Using getattr to bypass mypy platform-specific missing attribute check
+            setrlimit = getattr(resource, "setrlimit", None)
+            rlimit_as = getattr(resource, "RLIMIT_AS", None)
+            if setrlimit and rlimit_as is not None:
+                setrlimit(rlimit_as, (self.memory_limit, self.memory_limit))
 
-    def run(self, file_path):
-        """
-        Executes a Python file and captures its performance metrics.
+    def run(self, file_path: str) -> dict[str, Any]:
+        """Executes a Python file and captures its performance metrics.
 
         Args:
             file_path (str): The path to the script to execute.
@@ -45,16 +46,10 @@ class CodeExecutor:
         Returns:
             dict: Metrics including status, execution time, carbon
                 footprint estimate, and potential errors.
-
-                carbon_footprint_gCO2e is computed as:
-                      execution_time_sec * TDP_WATTS * CARBON_INTENSITY
-                    / 3_600_000
-                where TDP_WATTS=15 (typical laptop CPU) and
-                CARBON_INTENSITY=475 gCO2/kWh (IEA 2023 global average).
         """
         # Emission factors (conservative laptop defaults)
-        TDP_WATTS = 15          # typical laptop CPU TDP
-        CARBON_INTENSITY = 475  # gCO2/kWh — IEA 2023 global average
+        tdp_watts: int = 15          # typical laptop CPU TDP
+        carbon_intensity: int = 475  # gCO2/kWh — IEA 2023 global average
 
         if not os.path.exists(file_path):
             return {
@@ -64,7 +59,7 @@ class CodeExecutor:
                 "carbon_footprint_gCO2e": None
             }
 
-        start_time = time.perf_counter()
+        start_time: float = time.perf_counter()
         try:
             result = subprocess.run(
                 [sys.executable, file_path],
@@ -74,24 +69,28 @@ class CodeExecutor:
                 # Resource limiting only works on Unix systems
                 preexec_fn=(
                     self._limit_resources
-                    if (os.name != "nt" and resource)
+                    if (os.name != "nt" and resource is not None)
                     else None
                 )
             )
-            execution_time = round(time.perf_counter() - start_time, 4)
+            execution_time: float = round(time.perf_counter() - start_time, 4)
 
             # Carbon footprint estimate
-            # Formula: time(s) * power(W) * carbon_intensity(gCO2/kWh) / 3,600,000
-            carbon_footprint = round(
-                (execution_time * TDP_WATTS * CARBON_INTENSITY) / 3600000,
+            carbon_footprint: float = round(
+                (execution_time * tdp_watts * carbon_intensity) / 3600000,
                 9
             )
 
+            # Ensure stdout is safely treated as a string type
+            stdout_str: str = result.stdout if result.stdout is not None else ""
+
             return {
-                "status": "Success" if result.returncode == 0 else "Runtime Error",
+                "status": (
+                    "Success" if result.returncode == 0 else "Runtime Error"
+                ),
                 "execution_time": execution_time,
                 "carbon_footprint_gCO2e": carbon_footprint,
-                "stdout_preview": (result.stdout or "")[:1000].strip(),
+                "stdout_preview": stdout_str[:1000].strip(),
                 "stderr": (result.stderr or "").strip(),
                 "stdout": result.stdout
             }
@@ -113,29 +112,33 @@ class CodeExecutor:
                 "carbon_footprint_gCO2e": None
             }
 
-    def run_multiple(self, file_path, runs=3):
+    def run_multiple(self, file_path: str, runs: int = 3) -> dict[str, Any]:
         if runs < 1:
             raise ValueError(f"runs must be at least 1, got {runs}")
 
-        all_times = []
-        all_carbon = []
-        statuses = []
+        all_times: list[float] = []
+        all_carbon: list[float] = []
+        statuses: list[str] = []
 
         for _ in range(runs):
-            result = self.run(file_path)
-            statuses.append(result.get('status'))
+            result: dict[str, Any] = self.run(file_path)
 
-            exec_time = result.get('execution_time')
+            # Error Fix (Line 120): Ensure the extracted status is strictly a string
+            status_val = result.get('status')
+            statuses.append(str(status_val) if status_val is not None else "Unknown")
+
+            exec_time: Any = result.get('execution_time')
             if isinstance(exec_time, (int, float)):
-                all_times.append(exec_time)
+                all_times.append(float(exec_time))
 
-            carbon = result.get('carbon_footprint_gCO2e')
+            carbon: Any = result.get('carbon_footprint_gCO2e')
             if isinstance(carbon, (int, float)):
-                all_carbon.append(carbon)
+                all_carbon.append(float(carbon))
 
-        successful_runs = statuses.count('Success')
+        successful_runs: int = statuses.count('Success')
 
         # Determine overall status
+        overall_status: str
         if successful_runs == runs:
             overall_status = 'Success'
         elif successful_runs == 0:
@@ -144,13 +147,18 @@ class CodeExecutor:
             overall_status = 'Partial'
 
         # Compute statistics over successful run times
+        mean_time: Optional[float]
+        min_time: Optional[float]
+        max_time: Optional[float]
+        std_time: Optional[float]
+
         if all_times:
             mean_time = round(sum(all_times) / len(all_times), 6)
             min_time = round(min(all_times), 6)
             max_time = round(max(all_times), 6)
 
             if len(all_times) >= 2:
-                variance = sum(
+                variance: float = sum(
                     (t - mean_time) ** 2 for t in all_times
                 ) / (len(all_times) - 1)
                 std_time = round(variance ** 0.5, 6)
@@ -162,7 +170,7 @@ class CodeExecutor:
             max_time = None
             std_time = None
 
-        mean_carbon = (
+        mean_carbon: Optional[float] = (
             round(sum(all_carbon) / len(all_carbon), 9)
             if all_carbon else None
         )

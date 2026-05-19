@@ -118,7 +118,7 @@ class TestSaveGeneratedCode:
 
 class TestGenerateCodeOpenAI:
 
-    def generate_code_openai(prompt, model_name="gpt-4o"):
+    def generate_code_openai(self, prompt, model_name="gpt-4o"):
         if OpenAI is None:
             raise ImportError(
                 "openai is not installed. "

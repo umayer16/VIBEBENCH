@@ -2,9 +2,14 @@ import ast
 import re
 import math
 from collections import Counter
+from typing import Optional, Union
+
+# 1. Define your Type Alias here at the module level
+DocstringCompatibleNode = Union[ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef]
 
 
 class CodeAnalyzer:
+
     """
     A static analysis tool that parses Python code into an Abstract Syntax Tree (AST)
     to calculate complexity metrics and detect non-standard coding patterns.
@@ -25,20 +30,20 @@ class CodeAnalyzer:
         ast.Is, ast.IsNot, ast.In, ast.NotIn
     )
 
-    def __init__(self, code):
+    def __init__(self, code: str) -> None:
         """
         Initializes the analyzer by parsing source code into an AST.
 
         Args:
             code (str): The Python source code to be analyzed.
         """
-        self.code = code
+        self.code: str = code
         try:
-            self.tree = ast.parse(code)
+            self.tree: Optional[ast.Module] = ast.parse(code)
         except SyntaxError:
             self.tree = None
 
-    def calculate_halstead_metrics(self):
+    def calculate_halstead_metrics(self) -> Union[dict, str]:
         """
         Calculates Halstead Volume and Vocabulary metrics per Halstead (1977).
 
@@ -47,14 +52,14 @@ class CodeAnalyzer:
 
         Returns:
             dict: A dictionary containing 'n1', 'n2', 'N1', 'N2',
-                  'vocabulary', and 'volume', or a string error message
-                  on syntax failure.
+                'vocabulary', and 'volume', or a string error message
+                on syntax failure.
         """
         if not self.tree:
             return "Syntax Error"
 
-        operator_counts = Counter()
-        operand_counts = Counter()
+        operator_counts: Counter = Counter()
+        operand_counts: Counter = Counter()
 
         for node in ast.walk(self.tree):
             if isinstance(node, self.OPERATOR_NODES):
@@ -65,14 +70,14 @@ class CodeAnalyzer:
                 operand_counts[repr(node.value)] += 1
 
         # Halstead primitives
-        n1 = len(operator_counts)          # unique operators
-        n2 = len(operand_counts)           # unique operands
-        N1 = sum(operator_counts.values())   # total operator occurrences
-        N2 = sum(operand_counts.values())  # total operand occurrences
+        n1: int = len(operator_counts)          # unique operators
+        n2: int = len(operand_counts)           # unique operands
+        N1: int = sum(operator_counts.values())   # total operator occurrences
+        N2: int = sum(operand_counts.values())  # total operand occurrences
 
-        vocabulary = n1 + n2
-        length = N1 + N2
-        volume = length * math.log2(vocabulary) if vocabulary > 0 else 0
+        vocabulary: int = n1 + n2
+        length: int = N1 + N2
+        volume: float = length * math.log2(vocabulary) if vocabulary > 0 else 0.0
 
         return {
             "n1": n1,
@@ -83,7 +88,7 @@ class CodeAnalyzer:
             "volume": round(volume, 2)
         }
 
-    def detect_bad_practices(self):
+    def detect_bad_practices(self) -> list[str]:
         """
         Identifies patterns common in LLM outputs, such as hardcoded secrets,
         placeholder comments, ghost comments, and duplicate imports.
@@ -91,7 +96,7 @@ class CodeAnalyzer:
         Returns:
             list: A list of strings describing detected issues.
         """
-        findings = []
+        findings: list[str] = []
 
         # 1. Check for Hardcoded Secrets
         if re.search(
@@ -110,7 +115,7 @@ class CodeAnalyzer:
 
         # 4. Import Efficiency — checks both `import x` and `from x import y`
         if self.tree:
-            imports = []
+            imports: list[str] = []
             for node in ast.walk(self.tree):
                 if isinstance(node, ast.Import):
                     imports.extend(alias.name for alias in node.names)
@@ -133,19 +138,21 @@ class CodeAnalyzer:
 
         return findings
 
-    def get_docstring_coverage(self):
+    def get_docstring_coverage(self) -> Optional[float]:
         """
         Calculates the percentage of functions and classes that contain docstrings.
         Includes both regular and async function definitions.
 
         Returns:
             float: Coverage percentage (0.0 to 100.0), or None if no
-                   functions or classes are present in the code.
+                functions or classes are present in the code.
         """
         if not self.tree:
             return 0.0
 
-        functions = [
+        # (Explicitly type hint the list
+        # with the specific node types instead of a generic ast.AST)
+        functions: list[DocstringCompatibleNode] = [
             n for n in ast.walk(self.tree)
             if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
         ]
@@ -153,21 +160,23 @@ class CodeAnalyzer:
         if not functions:
             return None
 
-        documented = sum(1 for n in functions if ast.get_docstring(n))
+        # (Fix the generator type error by explicitly
+        # making the condition evaluate to a boolean)
+        documented: int = sum(1 for n in functions if ast.get_docstring(n) is not None)
         return round((documented / len(functions)) * 100, 2)
 
     def calculate_vibebench_score(
         self,
-        complexity,
-        docstring_coverage,
-        execution_time,
-        baseline_execution_time,
-        all_complexities=None,
-        all_exec_times=None,
-        w1=0.4,
-        w2=0.4,
-        w3=0.2
-    ):
+        complexity: Optional[float],
+        docstring_coverage: Optional[float],
+        execution_time: float,
+        baseline_execution_time: float,
+        all_complexities: Optional[list[float]] = None,
+        all_exec_times: Optional[list[float]] = None,
+        w1: float = 0.4,
+        w2: float = 0.4,
+        w3: float = 0.2
+    ) -> Optional[float]:
         """
         Calculates the composite VibeBench Score (Sigma) as defined in the
         paper Mathematics section.
@@ -177,27 +186,6 @@ class CodeAnalyzer:
         Where V_hat and M_hat are min-max normalised Halstead Volume and
         Cyclomatic Complexity respectively, and Phi is Operational Parity
         (T_base / T_llm).
-
-        Args:
-            complexity (float): Cyclomatic complexity of the file (M).
-            docstring_coverage (float): Docstring coverage 0-100.
-            execution_time (float): Execution time of this file in seconds.
-            baseline_execution_time (float): Execution time of human
-                baseline in seconds.
-            all_complexities (list): All complexity values in the benchmark
-                run, used for min-max normalisation. If None, normalisation
-                is skipped and raw value used.
-            all_exec_times (list): All execution times in the benchmark run,
-                used for min-max normalisation. If None, skipped.
-            w1 (float): Weight for Halstead Volume component (default 0.4).
-            w2 (float): Weight for Cyclomatic Complexity component
-                (default 0.4).
-            w3 (float): Weight for Operational Parity component
-                (default 0.2).
-
-        Returns:
-            float: VibeBench Score between 0.0 and 1.0, or None if
-                inputs are insufficient to calculate.
         """
         # Validate required inputs
         if complexity is None or execution_time is None:
@@ -206,19 +194,14 @@ class CodeAnalyzer:
             return None
         if abs(w1 + w2 + w3 - 1.0) > 0.001:
             raise ValueError(
-
                 f"Weights must sum to 1.0, got {w1 + w2 + w3:.3f}"
             )
 
         # --- Halstead Volume (V_hat) ---
-        # Use Halstead volume from the AST if available, else use 0
-        # halstead = self.calculate_halstead_metrics()
-        # Min-max normalise volume
         if all_complexities and len(all_complexities) > 1:
-
-            v_min = min(all_complexities)
-            v_max = max(all_complexities)
-            v_hat = (
+            v_min: float = min(all_complexities)
+            v_max: float = max(all_complexities)
+            v_hat: float = (
                 (complexity - v_min) / (v_max - v_min)
                 if v_max != v_min else 0.0
             )
@@ -228,9 +211,9 @@ class CodeAnalyzer:
 
         # --- Cyclomatic Complexity (M_hat) ---
         if all_complexities and len(all_complexities) > 1:
-            c_min = min(all_complexities)
-            c_max = max(all_complexities)
-            m_hat = (
+            c_min: float = min(all_complexities)
+            c_max: float = max(all_complexities)
+            m_hat: float = (
                 (complexity - c_min) / (c_max - c_min)
                 if c_max != c_min else 0.0
             )
@@ -238,14 +221,10 @@ class CodeAnalyzer:
             m_hat = min(complexity / 10.0, 1.0)
 
         # --- Operational Parity (Phi) ---
-        # Phi = T_base / T_llm
-        # Phi close to 1 = good parity. Phi > 1 = LLM is slower.
-        # Cap at 2.0 to prevent outliers dominating the score.
-        phi = min(baseline_execution_time / execution_time, 2.0)
-        # Normalise Phi to 0-1 range (1.0 = perfect parity or faster)
-        phi_normalised = min(phi / 2.0, 1.0)
+        phi: float = min(baseline_execution_time / execution_time, 2.0)
+        phi_normalised: float = min(phi / 2.0, 1.0)
 
         # --- Composite Score ---
-        sigma = (w1 * v_hat) + (w2 * m_hat) + (w3 * phi_normalised)
+        sigma: float = (w1 * v_hat) + (w2 * m_hat) + (w3 * phi_normalised)
 
         return round(sigma, 4)
