@@ -13,37 +13,44 @@ import argparse
 import json
 import os
 import re
-from typing import Any, Optional
+from typing import Any
+try:
+    # Newer OpenAI Python SDK exposes OpenAI client class
+    from openai import OpenAI
+except Exception:  # pragma: no cover - handled at runtime
+    OpenAI = None  # type: ignore[assignment, misc]
 
 
-def generate_code_openai(prompt: str, model_name: str = "gpt-4o") -> str:
-    """Sends a code generation prompt to the OpenAI API and returns the
-    generated Python code as a string.
+def generate_code_openai(prompt, model_name="gpt-4o", _client=None):
+    """
+    Sends a code generation prompt to the OpenAI API and returns
+    the generated Python code as a string.
 
     Args:
-        prompt (str): The coding task description to send to the model.
-        model_name (str): The OpenAI model to use.
+        prompt (str): The coding task description.
+        model_name (str): The OpenAI model to use. Default: gpt-4o.
+        _client: Optional pre-built client for testing. If None,
+            a real OpenAI client is constructed from OPENAI_API_KEY.
 
     Returns:
-        str: The generated Python code, or an error message string.
+        str: The generated Python code.
     """
-    try:
-        from openai import OpenAI
-    except ImportError:
-        raise ImportError(
-            "openai is not installed. " "Run: pip install openai"
-        )
+    if _client is None:
+        if OpenAI is None:
+            raise ImportError(
+                "openai is not installed. Run: pip install openai"
+            )
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            raise EnvironmentError(
+                "OPENAI_API_KEY environment variable is not set. "
+                "Get a key at https://platform.openai.com/api-keys"
+            )
+        client = OpenAI(api_key=api_key)
+    else:
+        client = _client
 
-    api_key: Optional[str] = os.environ.get("OPENAI_API_KEY")
-    if not api_key:
-        raise EnvironmentError(
-            "OPENAI_API_KEY environment variable is not set. "
-            "Get a key at https://platform.openai.com/api-keys"
-        )
-
-    client = OpenAI(api_key=api_key)
-
-    system_prompt: str = (
+    system_prompt = (
         "You are an expert Python developer. "
         "Write a complete, working Python function for the following task. "
         "Return ONLY the raw Python code with no markdown, no explanations, "
@@ -55,18 +62,20 @@ def generate_code_openai(prompt: str, model_name: str = "gpt-4o") -> str:
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": f"Task: {prompt}"}
-        ]
+        ],
+        temperature=0.2,
+        max_tokens=1024
     )
 
-    # Safely extract string content
-    content = getattr(response.choices[0].message, "content", "")
-    raw_code: str = content if content is not None else ""
-    code: str = raw_code.strip()
+    choice = response.choices[0]
+    message = getattr(choice, "message", None)
+    content = getattr(message, "content", None)
+    if content is None:
+        raise ValueError("OpenAI response did not contain any message content.")
 
-    # Strip markdown code fences if model includes them despite instructions
-    code = re.sub(r"^```python\s*", "", code, flags=re.MULTILINE)
-    code = re.sub(r"^```\s*", "", code, flags=re.MULTILINE)
-
+    code = content.strip()
+    code = re.sub(r'^```python\s*', '', code, flags=re.MULTILINE)
+    code = re.sub(r'^```\s*', '', code, flags=re.MULTILINE)
     return code.strip()
 
 
