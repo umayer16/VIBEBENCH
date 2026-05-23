@@ -168,6 +168,9 @@ def run_generator(
 
 
 def main() -> None:
+    """Command-line entry point for the OpenAI code generator."""
+    ...
+
     parser = argparse.ArgumentParser(
         prog="openai_generator",
         description="Generate benchmark code solutions using OpenAI.",

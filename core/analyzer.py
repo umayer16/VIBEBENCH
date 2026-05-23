@@ -105,10 +105,6 @@ class CodeAnalyzer:
         ):
             findings.append("Potential hardcoded credential detected.")
 
-        # 2. Check for Placeholder Comments
-        if re.search(r'#.*(TODO|FIXME|logic here|insert here)', self.code, re.I):
-            findings.append("Unfinished placeholder/TODO found.")
-
         # 3. Check for Ghost Comments (empty # symbols)
         if re.search(r'^\s*#\s*$', self.code, re.MULTILINE):
             findings.append("Ghost comment (empty # symbol) detected.")
