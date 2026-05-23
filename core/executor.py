@@ -113,6 +113,23 @@ class CodeExecutor:
             }
 
     def run_multiple(self, file_path: str, runs: int = 3) -> dict[str, Any]:
+        """Executes a Python file multiple times and returns aggregated
+        performance statistics for reproducibility analysis.
+
+        Args:
+            file_path (str): The path to the script to execute.
+            runs (int): Number of times to execute the file. Must be
+                at least 1. Default: 3.
+
+        Returns:
+            dict: Aggregated metrics including mean execution time,
+                standard deviation, min, max, successful run count,
+                and mean carbon footprint estimate.
+
+        Raises:
+            ValueError: If runs is less than 1.
+        """
+
         if runs < 1:
             raise ValueError(f"runs must be at least 1, got {runs}")
 

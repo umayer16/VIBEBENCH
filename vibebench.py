@@ -357,7 +357,7 @@ def main():
     args = parser.parse_args()
 
     if args.command == "analyze":
-        with open(args.input, "r") as f:
+        with open(args.input, "r", encoding='utf-8') as f:
             code = f.read()
 
         analyzer = CodeAnalyzer(code)
@@ -370,7 +370,7 @@ def main():
         }
 
         if args.output:
-            with open(args.output, "w") as f:
+            with open(args.output, "w", encoding='utf-8') as f:
                 json.dump(results, f, indent=2)
             print(f"Results saved to {args.output}")
         else:

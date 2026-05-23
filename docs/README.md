@@ -7,3 +7,4 @@
 | [Interpreting Results](interpreting-results.md) | What each metric means |
 
 For installation and quick start, see the main [README](../README.md).
+| [Self-Audit Results](docs/self-audit.md) | VibeBench evaluated against its own source code |
