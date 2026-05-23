@@ -118,7 +118,7 @@ class TestSaveGeneratedCode:
 
 class TestGenerateCodeOpenAI:
 
-    def generate_code_openai(prompt, model_name="gpt-4o"):
+    def generate_code_openai(self, prompt, model_name="gpt-4o"):
         if OpenAI is None:
             raise ImportError(
                 "openai is not installed. "
@@ -156,16 +156,16 @@ class TestGenerateCodeOpenAI:
         mock_client = MagicMock()
         mock_client.chat.completions.create.return_value = mock_response
 
-        with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}):
-            with patch(
-                'core.openai_generator.OpenAI',
-                return_value=mock_client,
-                create=True
-            ):
-                result = generate_code_openai("Write add function")
+        # Inject mock client directly — no patching needed
+        result = generate_code_openai(
+            "Write add function",
+            _client=mock_client
+        )
 
         assert "```" not in result
         assert "def add" in result
+
+
 
     def test_returns_clean_code(self):
         from core.openai_generator import generate_code_openai
@@ -179,12 +179,9 @@ class TestGenerateCodeOpenAI:
         mock_client = MagicMock()
         mock_client.chat.completions.create.return_value = mock_response
 
-        with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}):
-            with patch(
-                'core.openai_generator.OpenAI',
-                return_value=mock_client,
-                create=True
-            ):
-                result = generate_code_openai("Write fibonacci")
+        result = generate_code_openai(
+            "Write fibonacci",
+            _client=mock_client
+        )
 
         assert "def fibonacci" in result

@@ -1,39 +1,54 @@
-"""
-openai_generator.py
+"""openai_generator.py
 
 Generates Python code solutions using the OpenAI API for a given
 set of benchmark tasks, saving outputs to the datasets directory for
 VibeBench analysis.
 
 Usage:
-    python core/openai_generator.py --tasks datasets/prompts.json
-    python core/openai_generator.py --tasks datasets/prompts.json --model gpt-4o
+    python core/openai_generator.py --tasks datasets/tasks.json --model gpt-4o
+    python core/openai_generator.py --tasks datasets/tasks.json --model gpt-4o-mini
 """
 
-import os
-import json
 import argparse
+import json
+import os
 import re
-
+from typing import Any
 try:
+    # Newer OpenAI Python SDK exposes OpenAI client class
     from openai import OpenAI
-except ImportError:
-    OpenAI = None
+except Exception:  # pragma: no cover - handled at runtime
+    OpenAI = None  # type: ignore[assignment, misc]
 
 
-def generate_code_openai(prompt, model_name="gpt-4o"):
+def generate_code_openai(prompt, model_name="gpt-4o", _client=None):
+    """
+    Sends a code generation prompt to the OpenAI API and returns
+    the generated Python code as a string.
 
-    if OpenAI is None:
-        raise ImportError("openai is not installed.")
+    Args:
+        prompt (str): The coding task description.
+        model_name (str): The OpenAI model to use. Default: gpt-4o.
+        _client: Optional pre-built client for testing. If None,
+            a real OpenAI client is constructed from OPENAI_API_KEY.
 
-    api_key = os.environ.get("OPENAI_API_KEY")
-    if not api_key:
-        raise EnvironmentError(
-            "OPENAI_API_KEY environment variable is not set. "
-            "Get a key at https://platform.openai.com/api-keys"
-        )
-
-    client = OpenAI(api_key=api_key)
+    Returns:
+        str: The generated Python code.
+    """
+    if _client is None:
+        if OpenAI is None:
+            raise ImportError(
+                "openai is not installed. Run: pip install openai"
+            )
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            raise EnvironmentError(
+                "OPENAI_API_KEY environment variable is not set. "
+                "Get a key at https://platform.openai.com/api-keys"
+            )
+        client = OpenAI(api_key=api_key)
+    else:
+        client = _client
 
     system_prompt = (
         "You are an expert Python developer. "
@@ -52,60 +67,54 @@ def generate_code_openai(prompt, model_name="gpt-4o"):
         max_tokens=1024
     )
 
-    code = response.choices[0].message.content.strip()
+    choice = response.choices[0]
+    message = getattr(choice, "message", None)
+    content = getattr(message, "content", None)
+    if content is None:
+        raise ValueError("OpenAI response did not contain any message content.")
 
-    # Strip markdown code fences if model includes them despite instructions
+    code = content.strip()
     code = re.sub(r'^```python\s*', '', code, flags=re.MULTILINE)
     code = re.sub(r'^```\s*', '', code, flags=re.MULTILINE)
-
     return code.strip()
 
 
-def load_tasks(tasks_file):
-    """
-    Loads benchmark tasks from a JSON file.
+def load_tasks(tasks_file: str) -> list[dict[str, Any]]:
+    """Loads benchmark tasks from a JSON file.
 
     Args:
         tasks_file (str): Path to the tasks JSON file.
 
     Returns:
-        list: A list of task dicts with 'id' and 'prompt' keys.
-
-    Raises:
-        FileNotFoundError: If the tasks file does not exist.
+        list: A list of task dicts.
     """
-    if not os.path.exists(tasks_file):
-        raise FileNotFoundError(
-            f"Tasks file not found: {tasks_file}"
-        )
     with open(tasks_file, "r", encoding="utf-8") as f:
-        return json.load(f)
+        data: list[dict[str, Any]] = json.load(f)
+        return data
 
 
-def save_generated_code(code, model_name, task_name, output_dir="datasets"):
-    """
-    Saves generated code to the datasets directory under a
-    model-named subfolder.
+def save_generated_code(
+    code: str, model_name: str, task_name: str, output_dir: str = "datasets"
+) -> str:
+    """Saves generated code to the datasets directory under a model-named
+    subfolder.
 
     Args:
         code (str): The generated Python code.
         model_name (str): The model name (used as subfolder name).
         task_name (str): The task name (used as filename).
         output_dir (str): Root datasets directory.
-
-    Returns:
-        str: The full path to the saved file.
     """
-    safe_model = (
-        model_name.replace("/", "_")
-                  .replace("-", "_")
-                  .replace(".", "_")
+    # Sanitize model name for use as directory name
+    safe_model: str = (
+        model_name.replace("/", "_").replace("-", "_").replace(".", "_")
     )
-    model_dir = os.path.join(output_dir, safe_model)
+    model_dir: str = os.path.join(output_dir, safe_model)
     os.makedirs(model_dir, exist_ok=True)
 
-    safe_task = task_name.replace(" ", "_").lower()
-    filepath = os.path.join(model_dir, f"{safe_task}.py")
+    # Sanitize task name for use as filename
+    safe_task: str = task_name.replace(" ", "_").lower()
+    filepath: str = os.path.join(model_dir, f"{safe_task}.py")
 
     with open(filepath, "w", encoding="utf-8") as f:
         f.write(code)
@@ -114,85 +123,73 @@ def save_generated_code(code, model_name, task_name, output_dir="datasets"):
     return filepath
 
 
-def run_generator(tasks_file, model_name, output_dir="datasets"):
-    """
-    Main generation loop — loads tasks, calls OpenAI, saves outputs.
+def run_generator(
+    tasks_file: str, model_name: str, output_dir: str = "datasets"
+) -> None:
+    """Main generation loop — loads tasks, calls OpenAI, saves outputs.
 
     Args:
         tasks_file (str): Path to tasks JSON file.
         model_name (str): OpenAI model name to use.
         output_dir (str): Root datasets directory.
     """
-    tasks = load_tasks(tasks_file)
-    print(
-        f"\n🤖 Generating code with {model_name} "
-        f"for {len(tasks)} tasks...\n"
-    )
-
-    success = 0
-    failed = 0
+    tasks: list[dict[str, Any]] = load_tasks(tasks_file)
+    print(f"\n🤖 Generating code with {model_name} for {len(tasks)} tasks...\n")
+    success: int = 0
+    failed: int = 0
 
     for task in tasks:
-        name = task.get("name") or task.get("id", "unnamed_task")
-        prompt = task.get("prompt", "")
-        category = task.get("category", "")
-        difficulty = task.get("difficulty", "")
+        # Support both 'name' and 'id' as task identifier
+        name: str = str(task.get("name") or task.get("id", "unnamed_task"))
+        prompt: str = str(task.get("prompt", ""))
+        category: str = str(task.get("category", ""))
+        difficulty: str = str(task.get("difficulty", ""))
 
-        enriched_prompt = prompt
+        # Enrich the prompt with category and difficulty context
+        enriched_prompt: str = prompt
         if category or difficulty:
             enriched_prompt = (
-                f"[Category: {category} | Difficulty: {difficulty}]\n"
-                f"{prompt}"
+                f"[Category: {category} | Difficulty: {difficulty}]\n{prompt}"
             )
 
         print(f"  [{name}] {category} ({difficulty}) — Generating...")
 
         try:
-            code = generate_code_openai(
-                enriched_prompt, model_name=model_name
-            )
+            code: str = generate_code_openai(enriched_prompt, model_name=model_name)
             save_generated_code(code, model_name, name, output_dir)
             success += 1
         except Exception as e:
             print(f"  ❌ Failed [{name}]: {e}")
             failed += 1
 
-    print(
-        "\n✅ Generation complete: "
-        f"{success} succeeded, {failed} failed."
-    )
+    print(f"\n✅ Generation complete: {success} succeeded, {failed} failed.")
     print("\nRun VibeBench to analyze results:")
     print(f"  python vibebench.py benchmark --tasks {tasks_file}")
 
 
-def main():
-    """
-    Command-line entry point for the OpenAI code generator.
-    """
+def main() -> None:
     parser = argparse.ArgumentParser(
         prog="openai_generator",
-        description="Generate benchmark code solutions using OpenAI API."
+        description="Generate benchmark code solutions using OpenAI.",
     )
     parser.add_argument(
         "--tasks",
         required=True,
         metavar="FILE",
-        help="Path to tasks JSON file (e.g. datasets/prompts.json)."
+        help="Path to tasks JSON file (e.g. datasets/tasks.json).",
     )
     parser.add_argument(
         "--model",
         default="gpt-4o",
         metavar="MODEL",
-        help=(
-            "OpenAI model to use (default: gpt-4o). "
-            "Options: gpt-4o, gpt-4o-mini, gpt-4-turbo, gpt-3.5-turbo"
-        )
+        help="OpenAI model to use (default: gpt-4o). "
+        "Options: gpt-4o, gpt-4o-mini, o1-mini",
     )
     parser.add_argument(
         "--output-dir",
         default="datasets",
         metavar="DIR",
-        help="Root directory to save generated code (default: datasets/)."
+        help="Root directory to save generated code (default: datasets/).",
     )
 
     args = parser.parse_args()
