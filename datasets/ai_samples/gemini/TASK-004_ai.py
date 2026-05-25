@@ -3,7 +3,7 @@ import os
 
 def calculate_column_average(input_filename, output_filename):
     """
-    Reads a CSV, calculates the average of the second column, 
+    Reads a CSV, calculates the average of the second column,
     and writes the result to a text file.
     """
     if not os.path.exists(input_filename):
@@ -16,10 +16,10 @@ def calculate_column_average(input_filename, output_filename):
     try:
         with open(input_filename, mode='r', newline='', encoding='utf-8') as csvfile:
             reader = csv.reader(csvfile)
-            
+
             # Skip header if necessary; assuming data starts from row 1
             # If your CSV has a header, uncomment the next line:
-            # next(reader, None) 
+            # next(reader, None)
 
             for row in reader:
                 # Ensure the row has at least two columns
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     # Sample Execution: Create a dummy data.csv for testing
     input_file = 'data.csv'
     output_file = 'result.txt'
-    
+
     with open(input_file, mode='w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(['Item', 'Price']) # Header
@@ -58,7 +58,7 @@ if __name__ == "__main__":
 
     # Run the function
     calculate_column_average(input_file, output_file)
-    
+
     # Verify the result
     if os.path.exists(output_file):
         with open(output_file, 'r') as f:

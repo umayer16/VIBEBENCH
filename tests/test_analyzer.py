@@ -1,10 +1,9 @@
-import pytest
+# import pytest
 import sys
 import os
+from core.analyzer import CodeAnalyzer
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from core.analyzer import CodeAnalyzer
 
 
 # --- Test fixtures ---
@@ -130,21 +129,24 @@ class TestDetectBadPractices:
         analyzer = CodeAnalyzer(SIMPLE_CODE)
         findings = analyzer.detect_bad_practices()
         assert findings == []
+
     def test_detects_mutable_default_list(self):
         code = "def process(items=[]):\n    return items"
         analyzer = CodeAnalyzer(code)
         findings = analyzer.detect_bad_practices()
         assert any("mutable default" in f.lower() for f in findings)
+
     def test_detects_mutable_default_dict(self):
         code = "def fibonacci(n, memo={}):\n    return memo.get(n, n)"
         analyzer = CodeAnalyzer(code)
         findings = analyzer.detect_bad_practices()
         assert any("mutable default" in f.lower() for f in findings)
+
     def test_clean_function_no_mutable_default(self):
-            code = "def fibonacci(n, memo=None):\n    return n"
-            analyzer = CodeAnalyzer(code)
-            findings = analyzer.detect_bad_practices()
-            assert not any("mutable default" in f.lower() for f in findings)
+        code = "def fibonacci(n, memo=None):\n    return n"
+        analyzer = CodeAnalyzer(code)
+        findings = analyzer.detect_bad_practices()
+        assert not any("mutable default" in f.lower() for f in findings)
 
 
 # --- Docstring Coverage Tests ---
@@ -175,6 +177,7 @@ class TestDocstringCoverage:
         analyzer = CodeAnalyzer(SYNTAX_ERROR_CODE)
         result = analyzer.get_docstring_coverage()
         assert result == 0.0
+
 
 class TestVibeBenchScore:
     def test_score_returns_float_for_valid_inputs(self):
@@ -225,6 +228,7 @@ class TestVibeBenchScore:
                 w2=0.5,
                 w3=0.5   # sums to 1.5, not 1.0
             )
+
     def test_score_is_lower_for_simpler_code(self):
         """Lower VibeBench Score = better (simpler, faster)."""
         simple_code = "def add(a, b):\n    return a + b"
@@ -257,6 +261,3 @@ def process(data):
         assert simple_score is not None
         assert complex_score is not None
         assert simple_score < complex_score
-
-
-

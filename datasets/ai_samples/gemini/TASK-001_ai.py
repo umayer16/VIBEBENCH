@@ -7,16 +7,16 @@ class ListNode:
 def reverse_linked_list(head):
     """
     Reverses a singly linked list iteratively.
-    
+
     Args:
         head (ListNode): The head of the linked list.
-        
+
     Returns:
         ListNode: The new head of the reversed linked list.
     """
     prev = None
     current = head
-    
+
     while current:
         # Store the next node
         next_node = current.next
@@ -25,7 +25,7 @@ def reverse_linked_list(head):
         # Move pointers one step forward
         prev = current
         current = next_node
-        
+
     return prev
 
 def print_list(head):

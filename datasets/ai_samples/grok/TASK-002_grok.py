@@ -7,12 +7,12 @@ def get_ssl_expiry_date(hostname, port=443, timeout=8):
     """
     Connects to the host via SSL and returns the certificate's notAfter date.
     Returns None if connection fails or certificate cannot be retrieved.
-    
+
     Args:
         hostname (str): Domain name (e.g. 'google.com')
         port (int): Usually 443 for HTTPS
         timeout (int): Socket timeout in seconds
-    
+
     Returns:
         datetime.datetime or None
     """
@@ -20,37 +20,37 @@ def get_ssl_expiry_date(hostname, port=443, timeout=8):
         # Create a standard TCP socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(timeout)
-        
+
         # Wrap socket with SSL
         context = ssl.create_default_context()
         # We don't verify hostname here because we're only interested in getting cert
         # (most servers send the cert even if hostname doesn't match)
         ssl_sock = context.wrap_socket(sock, server_hostname=hostname)
-        
+
         # Connect
         ssl_sock.connect((hostname, port))
-        
+
         # Get the certificate in DER format
         cert = ssl_sock.getpeercert(binary_form=True)
-        
+
         # Close connection
         ssl_sock.close()
-        
+
         # Parse the certificate (returns dict with 'notAfter' field)
         cert_info = ssl.DER_cert_to_PEM_cert(cert)
         pem_cert = ssl.PEM_cert_to_DER_cert(cert_info)  # not needed, but for clarity
-        
+
         # Actually get the parsed certificate dictionary
         parsed_cert = ssl.getpeercert(ssl_sock, binary_form=False)
-        
+
         # 'notAfter' is in format: 'MMM DD HH:MM:SS YYYY GMT'
         expiry_str = parsed_cert['notAfter']
-        
+
         # Parse the date string
         expiry_date = datetime.strptime(expiry_str, '%b %d %H:%M:%S %Y %Z')
-        
+
         return expiry_date
-    
+
     except socket.timeout:
         print(f"Timeout connecting to {hostname}:{port}")
         return None
@@ -94,13 +94,13 @@ if __name__ == "__main__":
         "self-signed.badssl.com",
         "unreachable.example.invalid"
     ]
-    
+
     print("SSL Certificate Expiry Check\n" + "="*30 + "\n")
-    
+
     for host in test_hosts:
         print(f"Checking: {host}")
         expiry = get_ssl_expiry_date(host, timeout=6)
-        
+
         if expiry:
             days_left = days_until_expiry(expiry)
             status = "EXPIRED" if days_left < 0 else "VALID"
@@ -108,5 +108,5 @@ if __name__ == "__main__":
             print(f"  → Days left: {days_left} ({status})")
         else:
             print("  → Could not retrieve certificate")
-        
+
         print("-" * 50)

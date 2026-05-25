@@ -12,9 +12,9 @@ def process_csv_average(input_file, output_file):
             next(reader) # Skip header
             # Extract 2nd column and calculate mean
             values = [float(row[1]) for row in reader if len(row) > 1]
-            
+
         if not values: return "No data"
-        
+
         avg = sum(values) / len(values)
         with open(output_file, 'w') as f:
             f.write(f"Average: {avg}")

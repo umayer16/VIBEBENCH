@@ -9,8 +9,8 @@ of the published benchmark results.
 
 ## Issue DQ-001: TASK-004_chatgpt.py contains Dijkstra code
 
-**File:** `datasets/ai_samples/chatgpt/TASK-004_chatgpt.py`  
-**Discovered:** May 2026 (GitHub Issue #5)  
+**File:** `datasets/ai_samples/chatgpt/TASK-004_chatgpt.py`
+**Discovered:** May 2026 (GitHub Issue #5)
 **Severity:** Medium
 
 ### Description
@@ -51,8 +51,8 @@ in v2.0.0.
 
 ## Issue DQ-002: Gemini TASK-004 does not skip header row
 
-**File:** `datasets/ai_samples/gemini/TASK-004_ai.py`  
-**Discovered:** May 2026 (GitHub Issue #6)  
+**File:** `datasets/ai_samples/gemini/TASK-004_ai.py`
+**Discovered:** May 2026 (GitHub Issue #6)
 **Severity:** Low
 
 ### Description2

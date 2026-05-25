@@ -6,7 +6,7 @@ def calculate_average_second_column(csv_filename='data.csv', output_filename='re
     """
     Reads 'data.csv', computes the average of values in the second column (index 1),
     and writes the result to 'result.txt'.
-    
+
     Handles missing file and basic data issues gracefully.
     """
     if not os.path.exists(csv_filename):
@@ -25,14 +25,14 @@ def calculate_average_second_column(csv_filename='data.csv', output_filename='re
     try:
         with open(csv_filename, 'r', encoding='utf-8') as f:
             reader = csv.reader(f)
-            
+
             # Optional: skip header row if it exists
             # header = next(reader, None)   # uncomment if your file has headers
-            
+
             for row in reader:
                 if len(row) < 2:
                     continue  # skip malformed rows
-                    
+
                 try:
                     value = float(row[1])  # second column (0-based index 1)
                     total += value

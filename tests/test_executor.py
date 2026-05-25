@@ -1,11 +1,10 @@
 import os
 import sys
-from unittest import result
+# from unittest import result
 import pytest
+from core.executor import CodeExecutor
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from core.executor import CodeExecutor
 
 
 @pytest.fixture
@@ -57,7 +56,7 @@ class TestExecutorSuccess:
         result = executor.run(str(script))
         assert result["status"] == "Success"
         assert "VibeBench test output" in result.get("stdout_preview", "")
-    
+
     def test_carbon_footprint_present_on_success(self, tmp_path):
         """Successful runs should include a carbon_footprint_gCO2e field."""
         script = tmp_path / "hello.py"
@@ -140,6 +139,7 @@ class TestExecutorTimeout:
         script.write_text('while True:\n    pass\n')
         result = fast_executor.run(str(script))
         assert result["status"] == "Timeout"
+
 
 class TestRunMultiple:
 

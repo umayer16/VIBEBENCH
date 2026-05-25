@@ -5,46 +5,46 @@ from collections import defaultdict
 def dijkstra(graph, start):
     """
     Dijkstra's algorithm to find shortest paths from start node to all other nodes.
-    
+
     Args:
         graph: dict where keys are nodes, values are lists of (neighbor, weight) tuples
         start: starting node
-        
+
     Returns:
         dict: node → shortest distance from start
     """
     # Initialize distances: infinity for all nodes except start (0)
     distances = {node: float('inf') for node in graph}
     distances[start] = 0
-    
+
     # Priority queue: (distance, node)
     pq = [(0, start)]  # heapq is min-heap
-    
+
     # Keep track of visited nodes (optimization: we can skip already processed nodes)
     visited = set()
-    
+
     while pq:
         current_distance, current_node = heapq.heappop(pq)
-        
+
         # If we already found a better path earlier, skip this one
         if current_node in visited:
             continue
-            
+
         visited.add(current_node)
-        
+
         # Explore neighbors
         for neighbor, weight in graph[current_node]:
             if current_node in visited and neighbor in visited:
                 continue
-                
+
             distance = current_distance + weight
-            
+
             # If we found a shorter path to neighbor
             if distance < distances[neighbor]:
                 distances[neighbor] = distance
                 # Push the new better distance to the priority queue
                 heapq.heappush(pq, (distance, neighbor))
-    
+
     return distances
 
 
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     }
 
     start_node = 'A'
-    
+
     print("Graph structure:")
     for node, edges in graph.items():
         print(f"  {node} → {edges}")
@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
     # Run Dijkstra
     shortest_distances = dijkstra(graph, start_node)
-    
+
     # Output result
     print_shortest_paths(shortest_distances, start_node)
 
