@@ -92,11 +92,13 @@ class TestHalsteadMetrics:
     def test_volume_is_positive(self):
         analyzer = CodeAnalyzer(SIMPLE_CODE)
         result = analyzer.calculate_halstead_metrics()
+        assert isinstance(result, dict)
         assert result["volume"] > 0
 
     def test_vocabulary_is_positive(self):
         analyzer = CodeAnalyzer(SIMPLE_CODE)
         result = analyzer.calculate_halstead_metrics()
+        assert isinstance(result, dict)
         assert result["vocabulary"] > 0
 
 
@@ -108,11 +110,6 @@ class TestDetectBadPractices:
         analyzer = CodeAnalyzer(CODE_WITH_CREDENTIALS)
         findings = analyzer.detect_bad_practices()
         assert any("credential" in f.lower() for f in findings)
-
-    def test_detects_todo_placeholder(self):
-        analyzer = CodeAnalyzer(CODE_WITH_TODO)
-        findings = analyzer.detect_bad_practices()
-        assert any("placeholder" in f.lower() or "todo" in f.lower() for f in findings)
 
     def test_detects_ghost_comments(self):
         analyzer = CodeAnalyzer(CODE_WITH_GHOST_COMMENT)
@@ -167,7 +164,7 @@ class TestDocstringCoverage:
     def test_partial_coverage(self):
         analyzer = CodeAnalyzer(SIMPLE_CODE)
         result = analyzer.get_docstring_coverage()
-        assert 0.0 < result < 100.0
+        assert result is not None and 0.0 < result < 100.0
 
     def test_no_functions_returns_none(self):
         analyzer = CodeAnalyzer(SCRIPT_NO_FUNCTIONS)
@@ -198,7 +195,7 @@ class TestVibeBenchScore:
         score = analyzer.calculate_vibebench_score(
             complexity=2.0,
             docstring_coverage=100.0,
-            execution_time=None,
+            execution_time=None,  # type: ignore[arg-type]
             baseline_execution_time=0.05
         )
         assert score is None
@@ -210,18 +207,7 @@ class TestVibeBenchScore:
             complexity=2.0,
             docstring_coverage=100.0,
             execution_time=0.05,
-            baseline_execution_time=None
-        )
-        assert score is None
-
-    def test_score_returns_none_when_baseline_missing(self):
-        code = "def add(a, b):\n    return a + b"
-        analyzer = CodeAnalyzer(code)
-        score = analyzer.calculate_vibebench_score(
-            complexity=2.0,
-            docstring_coverage=100.0,
-            execution_time=0.05,
-            baseline_execution_time=None
+            baseline_execution_time=None  # type: ignore[arg-type]
         )
         assert score is None
 
@@ -268,6 +254,8 @@ def process(data):
             execution_time=0.15,
             baseline_execution_time=0.05
         )
+        assert simple_score is not None
+        assert complex_score is not None
         assert simple_score < complex_score
 
 

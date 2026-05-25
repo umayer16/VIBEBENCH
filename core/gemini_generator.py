@@ -57,7 +57,7 @@ def generate_code_gemini(prompt, model_name="gemini-1.5-flash"):
         model=model_name,
         contents=f"{system_prompt}\n\nTask: {prompt}"
     )
-    code = response.text.strip()
+    code = (response.text or "").strip()
 
     # Strip markdown code fences if model includes them despite instructions
     code = re.sub(r'^```python\s*', '', code, flags=re.MULTILINE)
@@ -149,6 +149,7 @@ def run_generator(tasks_file, model_name, output_dir="datasets"):
 
 
 def main():
+    """Command-line entry point for the Gemini code generator."""
 
     parser = argparse.ArgumentParser(
         prog="gemini_generator",

@@ -161,6 +161,8 @@ def run_generator(
 
 
 def main() -> None:
+    """Command-line entry point for the Groq code generator."""
+    ...
     parser = argparse.ArgumentParser(
         prog="groq_generator",
         description="Generate benchmark code solutions using Groq API.",
