@@ -54,7 +54,15 @@ class VibeBench:
         except Exception:
             return None
 
-    def _print_verbose(self, record):
+    def _print_verbose(self, record: dict) -> None:
+        """Prints per-file metric details to stdout in verbose mode.
+
+        Args:
+            record (dict): A single benchmark result record containing
+                execution_time_sec, docstring_coverage, complexity,
+                bad_practices_count, runs, successful_runs, and status.
+        """
+
         exec_time = record["execution_time_sec"]
         exec_time_str = (
             f"{exec_time:.4f}s"
@@ -236,7 +244,10 @@ class VibeBench:
             print("   You can generate it manually: python core/reporter.py")
 
 
-def main():
+def main() -> None:
+    """Entry point for the VibeBench CLI — parses arguments and dispatches
+    to the analyze, benchmark, or report subcommands."""
+
     import argparse
 
     parser = argparse.ArgumentParser(
