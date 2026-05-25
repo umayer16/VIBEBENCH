@@ -65,7 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   covers 10 tasks across 7 systems (3 models fully evaluated on all 10
   tasks, 4 models evaluated on original 5 tasks).
 
-### Fixed
+## Fixed
 
 - **Leaderboard column mismatch** — summary table header had 5 columns
   but rows had 6 values. Fixed in `core/reporter.py`.
@@ -78,7 +78,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `sample.json` in `__main__` block rather than using a self-contained
   test file. Fixed to create and clean up a temporary file.
 
-### Changed
+## Changed
 
 - `core/reporter.py` leaderboard sorted by success rate descending
   (previously sorted by model name alphabetically).
@@ -89,7 +89,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `pyproject.toml` now includes optional `[llm]` dependency group:
   `pip install vibebench[llm]` installs all three generator SDKs.
 
-### Dependencies
+## Dependencies
 
 - Added `scipy>=1.11.0` as a core dependency for statistical testing.
 - Added `openai>=1.0.0` to optional `[llm]` dependency group.
@@ -118,7 +118,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI status badge added to README.md
 - `CITATION.cff` keywords field added for improved discoverability
 
-### Fixed
+## Fixed
 
 - Leaderboard now sorted by success rate descending in `reporter.py` (#10)
 - Paper section headings corrected for JOSS compliance — `# Software design`
@@ -130,7 +130,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `save_report()` indentation corrected — was accidentally at module level
 - Paper word count expanded from 531 to ~1450 words
 
-### Changed
+## Changed
 
 - Python requirement updated from 3.8+ to 3.9+
 - Installation method updated to `pip install .` in README.md
@@ -140,7 +140,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.0] — 2026-03-09
 
-### Added
+## Added
 
 - Full multi-model benchmark results committed to the repository, comparing
   ChatGPT, Claude, Gemini, Grok, DeepSeek, and LLaMA 3.3 70B across 5 tasks
@@ -158,7 +158,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions CI workflow (`.github/workflows/tests.yml`) running pytest
   on every push and pull request
 
-### Fixed
+## Fixed
 
 - Halstead Volume formula corrected to track N1/N2 (total occurrences) and
   n1/n2 (unique counts) separately, as required by Halstead (1977)
@@ -171,7 +171,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `NameError` when called from outside `__main__`
 - Duplicate `bandit` and other entries removed from `requirements.txt`
 
-### Changed
+## Changed
 
 - `datasets/` directory restructured: AI samples organised under
   `datasets/ai_samples/<model>/` and human baseline under
@@ -183,7 +183,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.0] — 2026-02-28
 
-### Added
+## Added
 
 - Full `pytest` test suite in `tests/test_analyzer.py` covering Halstead
   metrics, bad practice detection, and docstring coverage across 15 test cases
@@ -192,7 +192,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Duplicate import detection in `CodeAnalyzer.detect_bad_practices()` covering
   both `import x` and `from x import y` forms
 
-### Fixed
+## Fixed
 
 - `CodeExecutor` resource limiting now skips `preexec_fn` on Windows (`os.name
   == 'nt'`) and when the `resource` module is unavailable, preventing import
@@ -200,7 +200,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Hardcoded credential regex tightened to require at least 8 characters,
   reducing false positives on short string assignments
 
-### Changed
+## Changed
 
 - `core/reporter.py` updated to handle `"Error"` strings in numeric fields
   gracefully when computing averages for the leaderboard summary table
@@ -209,7 +209,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] — 2026-02-24
 
-### Added
+## Added
 
 - Initial public release of VibeBench
 - `core/analyzer.py`: AST-based static analysis engine implementing:
