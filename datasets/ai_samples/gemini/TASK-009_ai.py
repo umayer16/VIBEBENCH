@@ -3,7 +3,7 @@ import re
 def is_valid_email(email):
     """
     Validates an email address using a regular expression.
-    
+
     Criteria:
     - Starts with alphanumeric characters, dots, underscores, or hyphens.
     - Contains an '@' symbol.
@@ -12,7 +12,7 @@ def is_valid_email(email):
     """
     # The regex pattern
     email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    
+
     # Check for a match
     if re.match(email_regex, email):
         return True

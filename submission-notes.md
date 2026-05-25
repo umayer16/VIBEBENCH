@@ -26,4 +26,3 @@
 | `# Software design` | `# Software Design` | ❌ Capital D |
 | `# Research impact statement` | *(missing entirely)* | ❌ |
 | `# AI usage disclosure` | `# AI usage disclosure` | ✅ |
-

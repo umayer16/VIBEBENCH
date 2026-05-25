@@ -1,0 +1,40 @@
+# .pre-commit-config.yaml
+# Pre-commit hooks for VibeBench
+# Install: pip install pre-commit && pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        name: Trim trailing whitespace
+      - id: end-of-file-fixer
+        name: Fix missing newline at end of file
+      - id: check-yaml
+        name: Check YAML syntax
+      - id: check-json
+        name: Check JSON syntax
+      - id: check-merge-conflict
+        name: Check for merge conflict markers
+      - id: debug-statements
+        name: Check for debug statements (pdb, breakpoint)
+
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        name: Lint with flake8
+        args: [--max-line-length=88]
+        exclude: datasets/
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        name: Type check with mypy
+        args: [--ignore-missing-imports]
+        files: ^core/
+        additional_dependencies:
+          - scipy
+          - types-requests

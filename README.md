@@ -148,6 +148,8 @@ VIBEBENCH/
 │   └── interpreting-results.md  # Guide: understand the metrics
 ├── figures/             # Architecture and leaderboard figures
 ├── tests/               # pytest test suite
+├── .pre-commit-config.yaml   # Pre-commit hook configuration
+├── setup.cfg                 # flake8 configuration
 ├── vibebench.py         # Main entry point
 ├── paper.md             # JOSS paper
 └── requirements.txt
@@ -240,6 +242,10 @@ If you use VibeBench in your research, please cite:
 
 Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) before
 opening a pull request.
+
+VibeBench uses pre-commit hooks for local code quality enforcement.
+Run `pip install pre-commit && pre-commit install` after cloning
+to enable automatic lint and type checking before each commit.
 
 ---
 

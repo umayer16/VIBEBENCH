@@ -8,7 +8,7 @@ task loading, and code-cleaning logic independently of the API.
 
 import os
 import json
-from openai import OpenAI, api_key
+from openai import OpenAI
 import pytest
 from unittest.mock import patch, MagicMock
 
@@ -125,13 +125,13 @@ class TestGenerateCodeOpenAI:
                 "Run: pip install openai"
             )
 
-        api_key = os.environ.get("OPENAI_API_KEY")
-        if not api_key:
-            raise EnvironmentError(
-                "OPENAI_API_KEY environment variable is not set. "
-                "Get a key at https://platform.openai.com/api-keys"
-            )
-        client = OpenAI(api_key=api_key)
+        # api_key = os.environ.get("OPENAI_API_KEY")
+        # if not api_key:
+        #     raise EnvironmentError(
+        #         "OPENAI_API_KEY environment variable is not set. "
+        #         "Get a key at https://platform.openai.com/api-keys"
+        #     )
+        # client = OpenAI(api_key=api_key)
 
     def test_raises_without_api_key(self):
         from core.openai_generator import generate_code_openai
@@ -164,8 +164,6 @@ class TestGenerateCodeOpenAI:
 
         assert "```" not in result
         assert "def add" in result
-
-
 
     def test_returns_clean_code(self):
         from core.openai_generator import generate_code_openai

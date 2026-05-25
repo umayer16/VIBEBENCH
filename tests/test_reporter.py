@@ -2,10 +2,9 @@ import json
 import os
 import pytest
 import sys
+from core.reporter import VibeReporter
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from core.reporter import VibeReporter
 
 
 # --- Fixtures ---
@@ -55,6 +54,7 @@ def sample_json_path(tmp_path):
     with open(path, 'w') as f:
         json.dump(data, f)
     return path
+
 
 SAMPLE_DATA = [
     {
@@ -194,13 +194,14 @@ class TestGenerateMarkdown:
         reporter.generate_markdown(output_file=output_path)
         assert os.path.exists(output_path)
 
+
 class TestStatisticalTesting:
     def test_compare_models_returns_dict(self, reporter):
         results = reporter.compare_models_statistically(
             metric='execution_time_sec'
         )
         assert isinstance(results, dict)
-    
+
     def test_compare_models_has_model_pairs(self, reporter):
         results = reporter.compare_models_statistically(
             metric='execution_time_sec'
@@ -208,7 +209,7 @@ class TestStatisticalTesting:
         # Should have at least one model pair
         total_pairs = sum(len(v) for v in results.values())
         assert total_pairs > 0
-    
+
     def test_significance_result_has_required_keys(self, reporter):
         results = reporter.compare_models_statistically(
             metric='execution_time_sec'
@@ -220,6 +221,7 @@ class TestStatisticalTesting:
                     assert 'p_value' in res
                     assert 'significant' in res
                     assert isinstance(res['significant'], bool)
+
     def test_p_value_between_0_and_1(self, reporter):
         results = reporter.compare_models_statistically(
             metric='complexity'
@@ -228,6 +230,7 @@ class TestStatisticalTesting:
             for model_b, res in comparisons.items():
                 if res.get('p_value') is not None:
                     assert 0.0 <= res['p_value'] <= 1.0
+
     def test_generates_significance_report_file(
         self, reporter, tmp_path
     ):
@@ -238,7 +241,7 @@ class TestStatisticalTesting:
             output_file=output_path
         )
         assert os.path.exists(output_path)
-    
+
     def test_significance_report_contains_headers(
         self, reporter, tmp_path
     ):
@@ -253,6 +256,7 @@ class TestStatisticalTesting:
         assert "Execution Time" in content
         assert "Cyclomatic Complexity" in content
         assert "p-value" in content
+
 
 class TestCompareRuns:
 
@@ -307,4 +311,3 @@ class TestCompareRuns:
         )
         for model, delta in changes.items():
             assert delta['delta_success_rate'] == 0.0
-

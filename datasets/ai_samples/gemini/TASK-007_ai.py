@@ -27,7 +27,7 @@ def merge(left, right):
     # If there are remaining elements in either list, append them
     sorted_list.extend(left[i:])
     sorted_list.extend(right[j:])
-    
+
     return sorted_list
 
 # Example usage:

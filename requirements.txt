@@ -19,3 +19,4 @@ openai>=1.0.0
 # --- Dev Tools ---
 flake8>=7.0.0
 mypy>=1.8.0
+pre-commit>=3.6.0
