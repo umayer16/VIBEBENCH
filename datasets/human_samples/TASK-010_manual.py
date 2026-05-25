@@ -1,35 +1,33 @@
 import asyncio
-try:
-    import aiohttp
-    AIOHTTP_AVAILABLE = True
-except ImportError:
-    AIOHTTP_AVAILABLE = False
 
-async def fetch_url(url, timeout=10):
-    # HUMAN TOUCH: Explicit timeout, clean error handling, returns None on failure
-    if not AIOHTTP_AVAILABLE:
-        return None, "aiohttp not installed"
+
+async def fetch_url(url, timeout=5):
+    # HUMAN TOUCH: Guard against missing aiohttp with a clear error
+    try:
+        import aiohttp
+    except ImportError:
+        return {"error": "aiohttp not installed — run: pip install aiohttp"}
+
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(
-                url,
-                timeout=aiohttp.ClientTimeout(total=timeout)
-            ) as response:
-                response.raise_for_status()
-                content = await response.text()
-                return content, None
+            async with session.get(url, timeout=aiohttp.ClientTimeout(total=timeout)) as response:
+                if response.status >= 400:
+                    return {
+                        "error": f"HTTP {response.status}",
+                        "url": url
+                    }
+                text = await response.text()
+                return {
+                    "url": url,
+                    "status": response.status,
+                    "length": len(text)
+                }
     except asyncio.TimeoutError:
-        return None, "Request timed out"
-    except aiohttp.ClientResponseError as e:
-        return None, f"HTTP error {e.status}"
-    except aiohttp.ClientError as e:
-        return None, f"Connection error: {e}"
+        return {"error": f"Timeout after {timeout}s", "url": url}
+    except Exception as e:
+        return {"error": str(e), "url": url}
+
 
 if __name__ == "__main__":
-    async def main():
-        content, error = await fetch_url('https://httpbin.org/get')
-        if error:
-            print(f"Error: {error}")
-        else:
-            print(f"Success: {len(content)} bytes received")
-    asyncio.run(main())
+    result = asyncio.run(fetch_url("https://httpbin.org/get"))
+    print(result)
