@@ -17,7 +17,7 @@ standards it applies to AI-generated code.
 | core/openai_generator.py | 2.80 | 100.0% | 0 | 1972.43 |
 | core/gemini_generator.py | 2.40 | 100.0% | 0 | 1392.86 |
 | core/groq_generator.py | 2.60 | 100.0% | 0 | 1883.0 |
-| vibebench.py | 7.43 | 100.0% | 0 | 4153.95 |
+| vibebench.py | 7.43 | 100.0% | 0 | 4203.62 |
 | **Average** | **5.67** | **100.0%** | **0** | — |
 
 ## Comparison Against Benchmark Models
@@ -61,6 +61,8 @@ The following issues were identified and resolved:
 7. **vibebench.py analyze command** — `open()` without
    `encoding='utf-8'` caused UnicodeDecodeError on Windows.
    Fixed.
+8. **vibebench.py** — `main()` and `_print_verbose()` missing
+   docstrings. Added.
 
 ## Conclusion
 
