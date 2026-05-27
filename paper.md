@@ -334,7 +334,7 @@ As shown in \autoref{fig:architecture}, the framework ensures that static heuris
 (Halstead complexity, docstring coverage) are captured independently of dynamic
 performance metrics.
 
-![A sample of the VibeBench Leaderboard output, demonstrating how model performance is ranked across multiple trials.\label{fig:leaderboard}](figures/leaderboard_sample.png){ width=80% }
+![The VibeBench Leaderboard showing aggregate performance of seven evaluated systems across ten benchmark tasks. Models are ranked by success rate. Metrics include average cyclomatic complexity, execution time, docstring coverage, bad practice count, and estimated carbon footprint (CO₂e).\label{fig:leaderboard}](figures/leaderboard_sample.png){ width=100% }
 
 ## AI usage disclosure
 
