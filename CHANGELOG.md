@@ -5,9 +5,89 @@ All notable changes to VibeBench will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Nothing yet.
+
 ---
 
-## [Unreleased]
+## [1.5.0] — 2026-05-25
+
+## Added
+
+- **flake8 enforcement in CI** — lint step added to GitHub Actions
+  workflow before test step. PRs that introduce PEP 8 violations
+  cannot be merged. Configuration in `setup.cfg`: max line length
+  88, W503 ignored, `datasets/` excluded.
+
+- **mypy type checking in CI** — type check step added to GitHub
+  Actions workflow. All public methods in `core/` modules have
+  return type annotations and parameter type hints. Run with
+  `--ignore-missing-imports` to avoid third-party stub issues.
+
+- **Type hints throughout `core/`** — `core/analyzer.py`,
+  `core/executor.py`, `core/reporter.py`, `core/openai_generator.py`,
+  `core/groq_generator.py` all have full type annotations on public
+  methods. Return types, parameter types, and local variable
+  annotations added.
+
+- **Pre-commit hooks** — `.pre-commit-config.yaml` added with eight
+  hooks: trailing-whitespace, end-of-file-fixer, check-yaml,
+  check-json, check-merge-conflict, debug-statements, flake8, mypy.
+  Install with: `pip install pre-commit && pre-commit install`.
+
+- **Self-audit results** — `docs/self-audit.md` documents VibeBench
+  evaluated against its own source code. All seven source files
+  achieve 100% docstring coverage and 0 bad practices after fixes
+  applied during audit. Average complexity: 5.72.
+
+- **Updated leaderboard figure** — `figures/leaderboard_sample.png`
+  replaced with 10-task 3-run benchmark results showing CO₂e column,
+  Runs column, and ranking by success rate. JOSS paper recompiled
+  with updated figure and caption.
+
+- **TASK-010 human baseline** — `datasets/human_samples/TASK-010_manual.py`
+  added. Demonstrates correct async HTTP dependency handling:
+  guards against missing aiohttp with try/except ImportError,
+  returns structured error dicts rather than raising exceptions.
+
+### Fixed
+
+- **`vibebench.py` analyze command UnicodeDecodeError** — file opened
+  without `encoding='utf-8'`, causing cp1252 decode failure on Windows
+  for files containing UTF-8 special characters (CO₂, →, etc.).
+  Fixed by adding `encoding='utf-8'` to the open() call.
+
+- **`core/reporter.py` complexity** — `generate_markdown()` had
+  complexity 24, `compare_runs()` had complexity 36 — both above
+  McCabe's high-risk threshold of 10. Refactored to extract helper
+  methods: `_aggregate_model_stats()`, `_format_summary_row()`,
+  `_format_detail_row()`, `_aggregate_run()`, `_format_delta()`,
+  `_build_comparison_row()`. Average complexity dropped to 9.18.
+
+- **`core/analyzer.py`** — TODO comment removed (triggered own bad
+  practice detector).
+
+- **`core/executor.py`** — `run_multiple()` missing docstring added.
+
+- **Generator `main()` functions** — docstrings added to `main()`
+  in all three generator modules (gemini, groq, openai).
+
+- **`vibebench.py`** — `main()` and `_print_verbose()` missing
+  docstrings added. Coverage: 71.43% → 100.0%.
+
+- **OpenAI generator mock tests** — dependency injection pattern
+  adopted (`_client` parameter). Eliminates need for `patch()` and
+  prevents real API calls during testing.
+
+### Changed
+
+- `core/reporter.py` refactored — helper methods extracted from
+  `generate_markdown()` and `compare_runs()` for maintainability.
+- All source files now pass self-audit: 100% docstring coverage,
+  0 bad practices, all complexity scores below McCabe threshold of 10.
 
 ---
 
@@ -237,7 +317,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/umayer16/VIBEBENCH/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/umayer16/VIBEBENCH/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/umayer16/VIBEBENCH/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/umayer16/VIBEBENCH/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/umayer16/VIBEBENCH/releases/tag/v1.3.0
 [1.2.0]: https://github.com/umayer16/VIBEBENCH/compare/v1.1.0...v1.2.0
