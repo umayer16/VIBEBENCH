@@ -5,16 +5,16 @@ authors:
     given-names: Muktadir
     orcid: "https://orcid.org/0009-0005-6412-8980"
 title: "VibeBench: An Automated Framework for the Holistic Evaluation of LLM-Generated Code"
-version: 1.4.0
-doi: 10.5281/zenodo.19995903
-date-released: '2026-05-18'
+version: 1.5.0
+doi: 10.5281/zenodo.18758578
+date-released: 2026-05-25
 url: "https://github.com/umayer16/VIBEBENCH"
 keywords:
   - LLM evaluation
   - code quality
   - static analysis
-  - dynamic execution
   - Python
+  - benchmarking
   - software engineering
 preferred-citation:
   type: article
@@ -22,5 +22,6 @@ preferred-citation:
     - family-names: Arif
       given-names: Muktadir
   title: "VibeBench: An Automated Framework for the Holistic Evaluation of LLM-Generated Code"
-  journal: "arXiv preprint arXiv:submit/7405540"
+  journal: "arXiv preprint arXiv:2605.XXXXX"
   year: 2026
+  url: "https://arxiv.org/abs/2605.XXXXX"
